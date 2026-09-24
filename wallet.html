@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CODERED - Wallet</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+    <style>
+        /* --- CORE STYLES --- */
+        :root {
+            --bg-dark: #0f1014;
+            --bg-card: #18191f;
+            --bg-sidebar: #0a0b0d;
+            --accent-red: #ff3e55;
+            --accent-blue: #2d8cf0;
+            --accent-green: #2ecc71;
+            --text-main: #ffffff;
+            --text-muted: #8b949e;
+            --border-color: #2f333a;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* --- SIDEBAR --- */
+        .sidebar {
+            width: 260px;
+            background-color: var(--bg-sidebar);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            flex-shrink: 0;
+        }
+
+        .brand {
+            display: flex; align-items: center; gap: 10px;
+            font-size: 1.2rem; font-weight: 700; margin-bottom: 40px;
+            color: var(--accent-red);
+        }
+
+        .nav-menu { list-style: none; flex-grow: 1; }
+        
+        .nav-link {
+            display: flex; align-items: center; gap: 12px;
+            padding: 12px 16px; text-decoration: none;
+            color: var(--text-muted); border-radius: 8px;
+            transition: all 0.3s ease; font-weight: 500; margin-bottom: 5px;
+        }
+
+        .nav-link:hover { background-color: rgba(255, 255, 255, 0.05); color: white; }
+        .nav-link.active { background-color: rgba(255, 62, 85, 0.1); color: var(--accent-red); border-left: 3px solid var(--accent-red); }
+        
+        .wallet-badge { margin-left: auto; color: var(--accent-green); font-size: 0.9rem; }
+
+        .user-profile {
+            margin-top: auto; display: flex; align-items: center; gap: 12px;
+            padding: 15px; background-color: var(--bg-card); border-radius: 12px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .avatar {
+            width: 40px; height: 40px; border-radius: 50%;
+            background-color: var(--accent-red);
+            display: flex; align-items: center; justify-content: center; font-weight: bold;
+        }
+
+        /* --- MAIN CONTENT --- */
+        .main-content {
+            flex-grow: 1;
+            padding: 40px;
+            overflow-y: auto;
+        }
+
+        .page-header { margin-bottom: 30px; }
+        .page-header h1 { font-size: 2rem; font-weight: 700; margin-bottom: 5px; }
+        .page-header p { color: var(--text-muted); }
+
+        /* --- WALLET CARDS --- */
+        .wallet-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .wallet-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .card-label { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 10px; display: flex; align-items: center; gap: 10px; }
+        .balance-value { font-size: 2.5rem; font-weight: 700; color: var(--accent-blue); margin-bottom: 5px; }
+        
+        .add-money-btn {
+            background: transparent;
+            border: 1px solid var(--accent-blue);
+            color: var(--accent-blue);
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            margin-left: auto;
+        }
+        .add-money-btn:hover { background: rgba(45, 140, 240, 0.1); }
+
+        /* --- TRANSACTION HISTORY --- */
+        .section-title { font-size: 1.2rem; font-weight: 600; margin-bottom: 20px; }
+
+        .tx-list {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            overflow: hidden;
+            min-height: 100px;
+        }
+        
+        /* Empty State */
+        .no-tx { padding: 30px; text-align: center; color: var(--text-muted); font-style: italic; }
+
+        .tx-item {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+            transition: background 0.2s;
+        }
+        .tx-item:last-child { border-bottom: none; }
+        .tx-item:hover { background-color: rgba(255,255,255,0.02); }
+
+        .tx-icon-box {
+            width: 40px; height: 40px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            margin-right: 20px;
+            font-size: 1rem;
+        }
+
+        .icon-income { background: rgba(46, 204, 113, 0.1); color: var(--accent-green); }
+        .icon-expense { background: rgba(255, 62, 85, 0.1); color: var(--accent-red); }
+        .icon-topup { background: rgba(45, 140, 240, 0.1); color: var(--accent-blue); }
+
+        .tx-details { flex-grow: 1; }
+        .tx-title { font-weight: 500; font-size: 1rem; margin-bottom: 4px; }
+        .tx-date { color: var(--text-muted); font-size: 0.85rem; }
+
+        .tx-amount { font-weight: 700; font-size: 1rem; }
+        .amount-green { color: var(--accent-green); }
+        .amount-red { color: var(--accent-red); }
+        .amount-blue { color: var(--accent-blue); }
+
+    </style>
+</head>
+<body>
+
+    <nav class="sidebar">
+        <div class="brand"><i class="fas fa-bolt"></i> CODERED</div>
+        <ul class="nav-menu">
+            <li class="nav-item"><a href="index.html" class="nav-link"><i class="fas fa-home"></i> Home</a></li>
+            <li class="nav-item"><a href="courses.html" class="nav-link"><i class="fas fa-book-open"></i> Courses</a></li>
+            <li class="nav-item"><a href="mycorse.html" class="nav-link"><i class="fas fa-folder"></i> My Courses</a></li>
+            <li class="nav-item"><a href="game.html" class="nav-link"><i class="fas fa-gamepad"></i> Games</a></li>
+            <li class="nav-item">
+                <a href="wallet.html" class="nav-link active">
+                    <i class="fas fa-wallet"></i> Wallet
+                    <span class="wallet-badge" id="sidebar-wallet">₹4,500</span>
+                </a>
+            </li>
+        </ul>
+        <div class="user-profile">
+            <div class="avatar" id="sidebar-avatar">U</div>
+            <div>
+                <h4 id="sidebar-name">Loading...</h4>
+                <p style="font-size:0.8rem; color:#8b949e;">Student</p>
+            </div>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        
+        <div class="page-header">
+            <h1>Wallet</h1>
+            <p>Manage your balance and track transactions</p>
+        </div>
+
+        <div class="wallet-grid">
+            <div class="wallet-card">
+                <div>
+                    <div class="card-label">
+                        <i class="fas fa-wallet" style="color:var(--accent-blue)"></i> Wallet Balance
+                    </div>
+                    <div class="balance-value" id="main-balance">₹0</div>
+                    <div style="color: var(--accent-green); font-size: 0.9rem;">
+                        <i class="fas fa-check-circle"></i> Secure Payments
+                    </div>
+                </div>
+                <div style="margin-top: 20px; display:flex;">
+                    <button class="add-money-btn" onclick="addMoney()">+ Add Money</button>
+                </div>
+            </div>
+
+            <div class="wallet-card">
+                <div>
+                    <div class="card-label">
+                        <i class="fas fa-chart-bar" style="color:var(--accent-green)"></i> Potential Earnings
+                    </div>
+                    <div class="balance-value" style="color:var(--accent-green)">₹2,000</div>
+                </div>
+                <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 10px;">
+                    Complete courses to earn rewards!
+                </p>
+            </div>
+        </div>
+
+        <h3 class="section-title">Transaction History</h3>
+        <div class="tx-list" id="transaction-list">
+            <div class="no-tx">Loading history...</div>
+        </div>
+
+    </main>
+
+    <script>
+        // --- 1. SETUP NAME & LOAD DATA ---
+        // Get username from storage
+        const username = localStorage.getItem('codered_username') || "Guest";
+        
+        // Update sidebar profile
+        document.getElementById('sidebar-name').innerText = username;
+        document.getElementById('sidebar-avatar').innerText = username.charAt(0).toUpperCase();
+
+        let currentBalance = parseInt(localStorage.getItem('codered_balance') || 4500);
+        let transactions = JSON.parse(localStorage.getItem('codered_transactions') || "[]");
+
+        // --- 2. Update Display Functions ---
+        function updateDisplay() {
+            // Update Balance Text
+            const fmtBalance = "₹" + currentBalance.toLocaleString();
+            document.getElementById('main-balance').innerText = fmtBalance;
+            document.getElementById('sidebar-wallet').innerText = fmtBalance;
+
+            // Update Transaction List
+            const list = document.getElementById('transaction-list');
+            list.innerHTML = ""; // Clear current list
+
+            if (transactions.length === 0) {
+                list.innerHTML = '<div class="no-tx">No transactions yet.</div>';
+                return;
+            }
+
+            // Loop through transactions and create HTML
+            transactions.forEach(tx => {
+                const item = document.createElement('div');
+                item.className = 'tx-item';
+
+                let iconClass = 'icon-topup'; 
+                let icon = 'fa-wallet';
+                let colorClass = 'amount-blue';
+                let sign = '+ ';
+
+                if (tx.type === 'expense') {
+                    iconClass = 'icon-expense';
+                    icon = 'fa-arrow-up'; // Money going out
+                    colorClass = 'amount-red';
+                    sign = '- ';
+                } else if (tx.type === 'income') {
+                    iconClass = 'icon-income';
+                    icon = 'fa-arrow-down'; // Money coming in
+                    colorClass = 'amount-green';
+                    sign = '+ ';
+                }
+
+                item.innerHTML = `
+                    <div class="tx-icon-box ${iconClass}"><i class="fas ${icon}"></i></div>
+                    <div class="tx-details">
+                        <div class="tx-title">${tx.title}</div>
+                        <div class="tx-date">${tx.date}</div>
+                    </div>
+                    <div class="tx-amount ${colorClass}">${sign}₹${tx.amount.toLocaleString()}</div>
+                `;
+                
+                list.appendChild(item);
+            });
+        }
+        
+        // Initial Render
+        updateDisplay();
+
+        // --- 3. Add Money Feature ---
+        function addMoney() {
+            let amount = prompt("Enter amount to add (e.g., 500):");
+            if (amount && !isNaN(amount) && amount > 0) {
+                amount = parseInt(amount);
+                
+                // Update Balance
+                currentBalance += amount;
+                localStorage.setItem('codered_balance', currentBalance);
+
+                // Add Transaction Record
+                const newTx = {
+                    title: "Wallet Top-up",
+                    date: new Date().toLocaleDateString(),
+                    amount: amount,
+                    type: "topup"
+                };
+                
+                // Add to beginning of array
+                transactions.unshift(newTx);
+                localStorage.setItem('codered_transactions', JSON.stringify(transactions));
+
+                updateDisplay();
+                alert("Successfully added ₹" + amount);
+            }
+        }
+    </script>
+</body>
+</html>

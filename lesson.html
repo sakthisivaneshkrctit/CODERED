@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CODERED - Battle Arena</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+    <style>
+        /* --- UNIFIED CSS --- */
+        :root {
+            --bg-dark: #0f1014;
+            --bg-card: #18191f;
+            --bg-sidebar: #0a0b0d;
+            --accent-red: #ff3e55;
+            --accent-blue: #2d8cf0;
+            --accent-green: #2ecc71;
+            --accent-purple: #9b59b6;
+            --text-main: #ffffff;
+            --text-muted: #8b949e;
+            --border-color: #2f333a;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* --- Full Sidebar --- */
+        .sidebar {
+            width: 260px;
+            background-color: var(--bg-sidebar);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            flex-shrink: 0;
+        }
+
+        .brand {
+            display: flex; align-items: center; gap: 10px;
+            font-size: 1.2rem; font-weight: 700; margin-bottom: 40px;
+            color: var(--accent-red);
+        }
+
+        .nav-menu { list-style: none; flex-grow: 1; }
+        
+        .nav-link {
+            display: flex; align-items: center; gap: 12px;
+            padding: 12px 16px; text-decoration: none;
+            color: var(--text-muted); border-radius: 8px;
+            transition: all 0.3s ease; font-weight: 500; margin-bottom: 5px;
+        }
+
+        .nav-link:hover { background-color: rgba(255, 255, 255, 0.05); color: white; }
+        
+        .wallet-badge { margin-left: auto; color: var(--accent-green); font-size: 0.9rem; }
+
+        .user-profile {
+            margin-top: auto; display: flex; align-items: center; gap: 12px;
+            padding: 15px; background-color: var(--bg-card); border-radius: 12px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .avatar {
+            width: 40px; height: 40px; border-radius: 50%;
+            background-color: var(--accent-red);
+            display: flex; align-items: center; justify-content: center; font-weight: bold;
+        }
+
+        /* --- Main Content Area --- */
+        .main-content {
+            flex-grow: 1;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        /* --- Header / Progress Bar --- */
+        .battle-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .back-link {
+            color: var(--text-muted); text-decoration: none; display: flex; align-items: center; gap: 8px;
+            transition: color 0.2s;
+        }
+        .back-link:hover { color: white; }
+
+        .progress-steps {
+            display: flex; align-items: center; gap: 15px;
+            background: var(--bg-card); padding: 10px 25px; border-radius: 30px;
+            border: 1px solid var(--border-color);
+        }
+
+        .step-item { display: flex; align-items: center; gap: 8px; color: var(--text-muted); font-size: 0.9rem; }
+        .step-item.active { color: var(--accent-green); font-weight: 600; }
+        .step-dot { width: 8px; height: 8px; border-radius: 50%; background-color: #333; }
+        .active .step-dot { background-color: var(--accent-green); box-shadow: 0 0 10px rgba(46, 204, 113, 0.4); }
+
+        /* --- Stage Containers --- */
+        .stage-container {
+            flex-grow: 1;
+            display: none; /* Hidden by default */
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.4s ease;
+        }
+        .stage-container.active-stage { display: flex; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Stage 1: Video */
+        .video-wrapper {
+            width: 100%; max-width: 900px; aspect-ratio: 16/9;
+            background: black; border-radius: 16px; border: 1px solid var(--border-color);
+            display: flex; align-items: center; justify-content: center; position: relative;
+        }
+        .play-icon { font-size: 4rem; color: rgba(255,255,255,0.8); cursor: pointer; transition: transform 0.2s; }
+        .play-icon:hover { transform: scale(1.1); color: var(--accent-red); }
+
+        /* Stage 2: Logic */
+        .quiz-box {
+            background: var(--bg-card); padding: 40px; border-radius: 16px; width: 100%; max-width: 600px;
+            border: 1px solid var(--border-color);
+        }
+        .option-btn {
+            display: block; width: 100%; padding: 15px; margin-bottom: 10px;
+            background: #23242a; border: 1px solid var(--border-color); border-radius: 8px;
+            color: var(--text-muted); cursor: pointer; text-align: left; transition: all 0.2s;
+        }
+        .option-btn:hover { border-color: var(--accent-blue); background: rgba(45, 140, 240, 0.1); color: white; }
+        .option-btn.correct { border-color: var(--accent-green); background: rgba(46, 204, 113, 0.2); color: var(--accent-green); }
+        .option-btn.wrong { border-color: var(--accent-red); background: rgba(255, 62, 85, 0.2); }
+
+        /* Stage 3: Battle (Shadow Code) */
+        .battle-ui { width: 100%; max-width: 1000px; }
+        
+        .health-bars {
+            display: flex; justify-content: space-between; margin-bottom: 20px;
+            background: var(--bg-card); padding: 15px; border-radius: 12px; border: 1px solid var(--border-color);
+        }
+        .hp-segment { width: 45%; }
+        .hp-track { height: 8px; background: #333; border-radius: 4px; overflow: hidden; margin-top: 8px; }
+        .hp-fill { height: 100%; transition: width 0.3s; }
+        
+        .code-container {
+            position: relative; height: 450px; background: #15161a;
+            border-radius: 12px; border: 1px solid var(--border-color); overflow: hidden;
+            font-family: 'Consolas', monospace; font-size: 15px; line-height: 1.6;
+        }
+
+        #shadow-text {
+            position: absolute; top: 20px; left: 20px; color: #444; pointer-events: none; white-space: pre-wrap;
+        }
+        #user-text {
+            position: absolute; top: 20px; left: 20px; color: var(--accent-green); pointer-events: none; white-space: pre-wrap;
+        }
+        .cursor { display: inline-block; width: 2px; height: 16px; background: var(--accent-green); vertical-align: middle; animation: blink 1s infinite; }
+        @keyframes blink { 50% { opacity: 0; } }
+
+        #hidden-input {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: text;
+        }
+
+        .battle-footer {
+            margin-top: 20px; display: flex; justify-content: space-between; align-items: center;
+        }
+
+        /* Finish Button - Hidden initially */
+        #finish-btn {
+            display: none;
+            background: var(--accent-green); color: #000; padding: 12px 30px;
+            border-radius: 8px; font-weight: 700; border: none; cursor: pointer;
+            box-shadow: 0 0 15px rgba(46, 204, 113, 0.4); animation: popUp 0.3s;
+        }
+        @keyframes popUp { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85); z-index: 100; display: none;
+            align-items: center; justify-content: center; backdrop-filter: blur(5px);
+        }
+        .modal-card {
+            background: var(--bg-card); border: 1px solid var(--accent-green);
+            padding: 40px; border-radius: 20px; text-align: center; width: 400px;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="sidebar">
+        <div class="brand"><i class="fas fa-bolt"></i> CODERED</div>
+        <ul class="nav-menu">
+            <li class="nav-item">
+                <a href="index.html" class="nav-link"><i class="fas fa-home"></i> Home</a>
+            </li>
+            <li class="nav-item">
+                <a href="courses.html" class="nav-link"><i class="fas fa-book-open"></i> Courses</a>
+            </li>
+            <li class="nav-item">
+                <a href="mycorse.html" class="nav-link active"><i class="fas fa-folder"></i> My Courses</a>
+            </li>
+            <li class="nav-item">
+                <a href="game.html" class="nav-link"><i class="fas fa-gamepad"></i> Games</a>
+            </li>
+            <li class="nav-item">
+                <a href="wallet.html" class="nav-link">
+                    <i class="fas fa-wallet"></i> Wallet
+                    <span class="wallet-badge" id="sidebar-wallet">₹4,500</span>
+                </a>
+            </li>
+        </ul>
+        <div class="user-profile">
+            <div class="avatar" id="sidebar-avatar">U</div>
+            <div>
+                <h4 id="sidebar-name">Loading...</h4>
+                <p style="font-size:0.8rem; color:#8b949e;">Student</p>
+            </div>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        
+        <div class="battle-header">
+            <a href="mycorse.html" class="back-link"><i class="fas fa-arrow-left"></i> Exit Battle</a>
+            
+            <div class="progress-steps">
+                <div class="step-item active" id="step-1"><span class="step-dot"></span> Video</div>
+                <div style="width: 20px; height: 1px; background: #333;"></div>
+                <div class="step-item" id="step-2"><span class="step-dot"></span> Logic</div>
+                <div style="width: 20px; height: 1px; background: #333;"></div>
+                <div class="step-item" id="step-3"><span class="step-dot"></span> Battle</div>
+            </div>
+        </div>
+
+        <div id="stage-video" class="stage-container active-stage">
+            <h2 style="margin-bottom: 15px;">Concept: Control Flow</h2>
+            <div class="video-wrapper" id="video-area">
+                <i class="fas fa-play-circle play-icon" onclick="playVideo()"></i>
+                <div id="vid-msg" style="display:none; color:white; font-size:1.5rem;">Simulating Lesson... <span id="timer">5</span></div>
+            </div>
+        </div>
+
+        <div id="stage-quiz" class="stage-container">
+            <div class="quiz-box">
+                <h4 style="color:#8b949e; margin-bottom:20px;">Logic Test <span id="q-count">1</span>/3</h4>
+                <h2 style="margin-bottom:30px;" id="q-text">Question goes here?</h2>
+                <div id="options-container">
+                    </div>
+            </div>
+        </div>
+
+        <div id="stage-battle" class="stage-container">
+            <div class="battle-ui">
+                <div class="health-bars">
+                    <div class="hp-segment">
+                        <div style="display:flex; justify-content:space-between; font-size:0.8rem;">
+                            <span><i class="fas fa-user"></i> You</span>
+                            <span id="error-display" style="color:var(--accent-red)">0 Errors</span>
+                        </div>
+                        <div class="hp-track"><div class="hp-fill" id="hp-player" style="width:100%; background:var(--accent-green);"></div></div>
+                    </div>
+                    <div class="hp-segment" style="text-align:right;">
+                        <div style="display:flex; justify-content:space-between; font-size:0.8rem;">
+                            <span>Bug Monster</span>
+                            <span><i class="fas fa-bug"></i></span>
+                        </div>
+                        <div class="hp-track"><div class="hp-fill" id="hp-enemy" style="width:100%; background:var(--accent-red);"></div></div>
+                    </div>
+                </div>
+
+                <div class="code-container" onclick="document.getElementById('hidden-input').focus()">
+                    <div id="shadow-text"></div>
+                    <div id="user-text"><span class="cursor"></span></div>
+                    <textarea id="hidden-input" spellcheck="false"></textarea>
+                </div>
+
+                <div class="battle-footer">
+                    <div style="color: #8b949e; font-size: 0.9rem;">
+                        <i class="fas fa-keyboard"></i> Type the code exactly to destroy the bug.
+                    </div>
+                    <button id="finish-btn" onclick="showReward()">
+                        <i class="fas fa-flag-checkered"></i> Finish & Claim Reward
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <div class="modal-overlay" id="victory-modal">
+        <div class="modal-card">
+            <i class="fas fa-crown" style="font-size: 4rem; color: #f1c40f; margin-bottom: 20px;"></i>
+            <h2 style="margin-bottom: 10px;">Battle Won!</h2>
+            <p id="reward-msg" style="color: #8b949e;">Perfect Logic.</p>
+            
+            <div style="font-size: 3rem; color: var(--accent-green); font-weight: 700; margin: 20px 0;" id="reward-amt">
+                ₹100
+            </div>
+            
+            <button onclick="window.location.href='index.html'" style="background: var(--accent-blue); color: white; padding: 12px 24px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold;">
+                Return to Base
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // --- 1. SETUP NAME & WALLET ---
+        // Get username from storage
+        const username = localStorage.getItem('codered_username') || "Guest";
+        
+        // Update sidebar
+        document.getElementById('sidebar-name').innerText = username;
+        document.getElementById('sidebar-avatar').innerText = username.charAt(0).toUpperCase();
+
+        let balance = parseInt(localStorage.getItem('codered_balance') || 4500);
+        document.getElementById('sidebar-wallet').innerText = "₹" + balance.toLocaleString();
+
+        // --- 2. Video Logic ---
+        function playVideo() {
+            document.querySelector('.play-icon').style.display = 'none';
+            document.getElementById('vid-msg').style.display = 'block';
+            let t = 5;
+            let timer = setInterval(() => {
+                t--;
+                document.getElementById('timer').innerText = t;
+                if(t <= 0) {
+                    clearInterval(timer);
+                    nextStage(2);
+                }
+            }, 1000);
+        }
+
+        // --- 3. Stage Navigation ---
+        function nextStage(num) {
+            // Hide all
+            document.querySelectorAll('.stage-container').forEach(el => el.classList.remove('active-stage'));
+            document.querySelectorAll('.step-item').forEach(el => el.classList.remove('active'));
+            
+            // Show specific
+            if(num === 2) {
+                document.getElementById('stage-quiz').classList.add('active-stage');
+                document.getElementById('step-2').classList.add('active');
+                loadQuestion();
+            } else if(num === 3) {
+                document.getElementById('stage-battle').classList.add('active-stage');
+                document.getElementById('step-3').classList.add('active');
+                initBattle();
+            }
+        }
+
+        // --- 4. Quiz Logic ---
+        const questions = [
+            { q: "What is the output of print(2 ** 3)?", opts: ["6", "8", "9", "5"], ans: 1 },
+            { q: "Which is a valid variable name?", opts: ["2var", "var-name", "_var_name", "var name"], ans: 2 },
+            { q: "Keyword to define a function?", opts: ["func", "def", "define", "function"], ans: 1 }
+        ];
+        let qIdx = 0;
+
+        function loadQuestion() {
+            if(qIdx >= questions.length) {
+                nextStage(3);
+                return;
+            }
+            const q = questions[qIdx];
+            document.getElementById('q-text').innerText = q.q;
+            document.getElementById('q-count').innerText = qIdx + 1;
+            
+            const cont = document.getElementById('options-container');
+            cont.innerHTML = "";
+            q.opts.forEach((o, i) => {
+                const btn = document.createElement('button');
+                btn.className = "option-btn";
+                btn.innerText = o;
+                btn.onclick = () => {
+                    if(i === q.ans) {
+                        btn.classList.add('correct');
+                        setTimeout(() => { qIdx++; loadQuestion(); }, 500);
+                    } else {
+                        btn.classList.add('wrong');
+                    }
+                }
+                cont.appendChild(btn);
+            });
+        }
+
+        // --- 5. Battle Logic (Shadow Code) ---
+        const targetCode = `def check_status(hp):
+    if hp > 50:
+        return "Healthy"
+    else:
+        return "Critical"
+
+player_hp = 45
+print(check_status(player_hp))`;
+
+        let battleErrors = 0;
+
+        function initBattle() {
+            document.getElementById('shadow-text').innerText = targetCode;
+            document.getElementById('hidden-input').focus();
+            
+            document.getElementById('hidden-input').addEventListener('input', (e) => {
+                const typed = e.target.value;
+                let html = "";
+                let errors = 0;
+                let correctCount = 0;
+
+                for(let i=0; i<typed.length; i++) {
+                    if(i < targetCode.length) {
+                        if(typed[i] === targetCode[i]) {
+                            html += `<span style="color:#2ecc71">${typed[i]}</span>`;
+                            correctCount++;
+                        } else {
+                            html += `<span style="color:#ff3e55; background:rgba(255,62,85,0.2)">${targetCode[i]}</span>`;
+                            errors++;
+                        }
+                    }
+                }
+                
+                // Cursor
+                html += '<span class="cursor"></span>';
+                document.getElementById('user-text').innerHTML = html;
+
+                // Update Stats
+                battleErrors = errors;
+                document.getElementById('error-display').innerText = errors + " Errors";
+                
+                // Enemy HP (Based on correct chars)
+                let percentDone = (correctCount / targetCode.length) * 100;
+                document.getElementById('hp-enemy').style.width = (100 - percentDone) + "%";
+                
+                // Player HP (Based on errors - visual only)
+                let pHp = 100 - (errors * 5);
+                if(pHp < 0) pHp = 0;
+                document.getElementById('hp-player').style.width = pHp + "%";
+
+                // Check Completion
+                if(typed.length >= targetCode.length) {
+                    document.getElementById('finish-btn').style.display = 'block'; // SHOW FINISH BUTTON
+                } else {
+                    document.getElementById('finish-btn').style.display = 'none';
+                }
+            });
+        }
+
+        // --- 6. Reward System ---
+        function showReward() {
+            let reward = 0;
+            let msg = "";
+
+            if(battleErrors < 15) {
+                reward = 100;
+                msg = "Clean Code Bonus! Amazing work.";
+            } else if (battleErrors > 50) {
+                reward = 80;
+                msg = "Code works, but it was messy.";
+            } else {
+                reward = 90;
+                msg = "Good solid coding.";
+            }
+
+            // Update Wallet in Storage
+            const newBal = balance + reward;
+            localStorage.setItem('codered_balance', newBal);
+            
+            // Update UI Sidebar immediately
+            document.getElementById('sidebar-wallet').innerText = "₹" + newBal.toLocaleString();
+
+            // Show Modal
+            document.getElementById('reward-amt').innerText = "₹" + reward;
+            document.getElementById('reward-msg').innerText = msg;
+            document.getElementById('victory-modal').style.display = 'flex';
+        }
+    </script>
+</body>
+</html>

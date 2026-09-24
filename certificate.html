@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CODERED - Certificates</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Pinyon+Script&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+    <style>
+        /* CORE STYLES */
+        :root { --bg-dark: #0f1014; --bg-card: #18191f; --bg-sidebar: #0a0b0d; --accent-red: #ff3e55; --accent-blue: #2d8cf0; --accent-green: #2ecc71; --accent-gold: #f1c40f; --text-main: #ffffff; --text-muted: #8b949e; --border-color: #2f333a; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background-color: var(--bg-dark); color: var(--text-main); display: flex; height: 100vh; overflow: hidden; }
+        .sidebar { width: 260px; background-color: var(--bg-sidebar); border-right: 1px solid var(--border-color); display: flex; flex-direction: column; padding: 20px; flex-shrink: 0; }
+        .brand { display: flex; align-items: center; gap: 10px; font-size: 1.2rem; font-weight: 700; margin-bottom: 40px; color: var(--accent-red); }
+        .nav-menu { list-style: none; flex-grow: 1; }
+        .nav-link { display: flex; align-items: center; gap: 12px; padding: 12px 16px; text-decoration: none; color: var(--text-muted); border-radius: 8px; transition: all 0.3s ease; font-weight: 500; margin-bottom: 5px; }
+        .nav-link:hover { background-color: rgba(255, 255, 255, 0.05); color: white; }
+        .nav-link.active { background-color: rgba(255, 62, 85, 0.1); color: var(--accent-red); border-left: 3px solid var(--accent-red); }
+        .wallet-badge { margin-left: auto; color: var(--accent-green); font-size: 0.9rem; }
+        .user-profile { margin-top: auto; display: flex; align-items: center; gap: 12px; padding: 15px; background-color: var(--bg-card); border-radius: 12px; border-top: 1px solid var(--border-color); }
+        .avatar { width: 40px; height: 40px; border-radius: 50%; background-color: var(--accent-red); display: flex; align-items: center; justify-content: center; font-weight: bold; overflow:hidden;}
+        .avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .main-content { flex-grow: 1; padding: 40px; overflow-y: auto; }
+        .page-header { margin-bottom: 30px; }
+        .page-header h1 { font-size: 2rem; font-weight: 700; margin-bottom: 5px; }
+        .cert-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); gap: 30px; }
+        .cert-card { background-color: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; overflow: hidden; position: relative; transition: transform 0.3s; }
+        .cert-card:hover { transform: translateY(-5px); }
+        .cert-earned { border: 1px solid var(--accent-gold); box-shadow: 0 0 15px rgba(241, 196, 15, 0.1); }
+        .cert-preview { height: 200px; background: #23242a; display: flex; align-items: center; justify-content: center; position: relative; border-bottom: 1px solid var(--border-color); }
+        .cert-icon { font-size: 4rem; color: #444; }
+        .earned-icon { color: var(--accent-gold); }
+        .cert-body { padding: 25px; }
+        .status-badge { display: inline-block; padding: 5px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; margin-bottom: 15px; }
+        .status-locked { background: rgba(255, 62, 85, 0.1); color: var(--accent-red); }
+        .status-progress { background: rgba(45, 140, 240, 0.1); color: var(--accent-blue); }
+        .status-completed { background: rgba(241, 196, 15, 0.1); color: var(--accent-gold); }
+        .btn-download { background: var(--accent-gold); color: black; width: 100%; padding: 10px; border-radius: 6px; font-weight: bold; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: background 0.3s; }
+        .btn-download:hover { background: #d4ac0d; }
+        .btn-disabled { background: #2f333a; color: #666; width: 100%; padding: 10px; border-radius: 6px; font-weight: bold; border: none; cursor: not-allowed; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .lock-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; flex-direction: column; color: white; gap: 10px; backdrop-filter: blur(2px); }
+        #cert-canvas { display: none; }
+    </style>
+</head>
+<body>
+
+    <nav class="sidebar">
+        <div class="brand"><i class="fas fa-bolt"></i> CODERED</div>
+        <ul class="nav-menu">
+            <li class="nav-item"><a href="index.html" class="nav-link"><i class="fas fa-home"></i> Home</a></li>
+            <li class="nav-item"><a href="courses.html" class="nav-link"><i class="fas fa-book-open"></i> Courses</a></li>
+            <li class="nav-item"><a href="mycorse.html" class="nav-link"><i class="fas fa-folder"></i> My Courses</a></li>
+            <li class="nav-item"><a href="game.html" class="nav-link"><i class="fas fa-gamepad"></i> Games</a></li>
+            <li class="nav-item"><a href="wallet.html" class="nav-link"><i class="fas fa-wallet"></i> Wallet</a></li>
+            <li class="nav-item"><a href="certificates.html" class="nav-link active"><i class="fas fa-certificate"></i> Certificates</a></li>
+            <li class="nav-item"><a href="profile.html" class="nav-link"><i class="fas fa-user"></i> Profile</a></li>
+        </ul>
+        <div class="user-profile">
+            <div class="avatar" id="sidebar-avatar">A</div>
+            <div><h4 id="sidebar-name">Alex Dev</h4><p>Lv. 12 Warrior</p></div>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <div class="page-header">
+            <h1>Your Certificates</h1>
+            <p>Download your official credentials.</p>
+        </div>
+
+        <div class="cert-grid">
+            <div class="cert-card cert-earned">
+                <div class="cert-preview">
+                    <i class="fas fa-award cert-icon earned-icon"></i>
+                </div>
+                <div class="cert-body">
+                    <span class="status-badge status-completed">Completed</span>
+                    <h3>Python Mastery</h3>
+                    <p style="color:#8b949e; font-size:0.85rem; margin-bottom:20px;">Issued: Oct 24, 2023</p>
+                    <button class="btn-download" onclick="generateCertificate('Python Mastery')">
+                        <i class="fas fa-download"></i> Download Certificate
+                    </button>
+                </div>
+            </div>
+
+            <div class="cert-card" id="c-cert-card">
+                <div class="cert-preview">
+                    <i class="fas fa-file-contract cert-icon"></i>
+                    <div class="lock-overlay" id="c-lock-overlay">
+                        <i class="fas fa-lock fa-2x"></i>
+                        <span>Course Locked</span>
+                    </div>
+                </div>
+                <div class="cert-body">
+                    <span class="status-badge status-locked" id="c-status-badge">Locked</span>
+                    <h3>C Programming Pro</h3>
+                    <p style="color:#8b949e; font-size:0.85rem; margin-bottom:20px;">Complete course to unlock.</p>
+                    <button class="btn-disabled" id="c-btn"><i class="fas fa-lock"></i> Locked</button>
+                </div>
+            </div>
+        </div>
+        
+        <canvas id="cert-canvas" width="1200" height="800"></canvas>
+    </main>
+
+    <script>
+        // ******************************************************
+        // PASTE YOUR GENERATED CODE BELOW BETWEEN THE QUOTES!
+        // It will look like: "data:image/png;base64,iVBORw0KGgo..."
+        // ******************************************************
+        
+        const FOUNDER_SIGNATURE_BASE64 = "signature.png"; // <-- PASTE HERE
+
+        // ******************************************************
+
+        // Init Sidebar & Data
+        const userName = localStorage.getItem('codered_username') || "Alex Developer";
+        document.getElementById('sidebar-name').innerText = userName;
+
+        const savedPhoto = localStorage.getItem('codered_photo');
+        if(savedPhoto) document.getElementById('sidebar-avatar').innerHTML = `<img src="${savedPhoto}">`;
+
+        // Check C Course
+        if (localStorage.getItem('codered_c_status') === 'unlocked') {
+            document.getElementById('c-lock-overlay').style.display = 'none';
+            const badge = document.getElementById('c-status-badge');
+            badge.className = 'status-badge status-progress';
+            badge.innerText = 'In Progress';
+            const btn = document.getElementById('c-btn');
+            btn.innerHTML = '<i class="fas fa-spinner"></i> In Progress';
+            btn.style.background = 'rgba(45, 140, 240, 0.1)';
+            btn.style.color = 'var(--accent-blue)';
+        }
+
+        function generateCertificate(courseName) {
+            const canvas = document.getElementById('cert-canvas');
+            const ctx = canvas.getContext('2d');
+            const date = new Date().toLocaleDateString();
+
+            // 1. White Background
+            ctx.fillStyle = "#fff";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // 2. Borders
+            ctx.strokeStyle = "#C5A059";
+            ctx.lineWidth = 20;
+            ctx.strokeRect(40, 40, canvas.width - 80, canvas.height - 80);
+            ctx.lineWidth = 2;
+            ctx.strokeRect(55, 55, canvas.width - 110, canvas.height - 110);
+
+            // 3. Text
+            ctx.fillStyle = "#1a1a1a";
+            ctx.font = "bold 60px 'Cinzel', serif";
+            ctx.textAlign = "center";
+            ctx.fillText("CERTIFICATE", canvas.width / 2, 160);
+            ctx.font = "30px 'Cinzel', serif";
+            ctx.fillText("OF COMPLETION", canvas.width / 2, 210);
+
+            // 4. "Presented To"
+            ctx.font = "italic 24px 'Inter', sans-serif";
+            ctx.fillStyle = "#666";
+            ctx.fillText("This is to certify that", canvas.width / 2, 300);
+
+            // 5. User Photo (If uploaded in Profile)
+            if(savedPhoto) {
+                const userImg = new Image();
+                userImg.src = savedPhoto;
+                userImg.onload = function() {
+                    ctx.save();
+                    ctx.beginPath();
+                    ctx.arc(1050, 150, 60, 0, Math.PI * 2, true);
+                    ctx.closePath();
+                    ctx.clip();
+                    ctx.drawImage(userImg, 990, 90, 120, 120);
+                    ctx.restore();
+                    drawRest(ctx, canvas, courseName, date);
+                }
+            } else {
+                drawRest(ctx, canvas, courseName, date);
+            }
+        }
+
+        function drawRest(ctx, canvas, courseName, date) {
+            // Student Name
+            ctx.font = "bold italic 80px 'Pinyon Script', cursive";
+            ctx.fillStyle = "#C5A059";
+            ctx.textAlign = "center";
+            ctx.fillText(userName, canvas.width / 2, 400);
+
+            // Underline
+            ctx.beginPath();
+            ctx.moveTo(canvas.width / 2 - 200, 420);
+            ctx.lineTo(canvas.width / 2 + 200, 420);
+            ctx.strokeStyle = "#C5A059";
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // Course Info
+            ctx.font = "italic 24px 'Inter', sans-serif";
+            ctx.fillStyle = "#666";
+            ctx.fillText("has successfully completed the course", canvas.width / 2, 480);
+            ctx.font = "bold 40px 'Cinzel', serif";
+            ctx.fillStyle = "#1a1a1a";
+            ctx.fillText(courseName, canvas.width / 2, 550);
+
+            // Date
+            ctx.font = "20px 'Inter', sans-serif";
+            ctx.fillStyle = "#888";
+            ctx.textAlign = "left";
+            ctx.fillText("Date: " + date, 100, 700);
+
+            // --- FOUNDER SIGNATURE (BASE64 or TEXT) ---
+            if (FOUNDER_SIGNATURE_BASE64 && FOUNDER_SIGNATURE_BASE64.length > 50) {
+                const sigImg = new Image();
+                sigImg.src = FOUNDER_SIGNATURE_BASE64;
+                sigImg.onload = function() {
+                    ctx.drawImage(sigImg, canvas.width - 300, 620, 200, 80);
+                    drawFounderLabels(ctx, canvas);
+                };
+                sigImg.onerror = function() {
+                    drawTextSignature(ctx, canvas);
+                }
+            } else {
+                drawTextSignature(ctx, canvas);
+            }
+        }
+
+        function drawTextSignature(ctx, canvas) {
+            ctx.textAlign = "right";
+            ctx.font = "italic 35px 'Pinyon Script', cursive";
+            ctx.fillStyle = "#1a1a1a"; 
+            ctx.fillText("Sakthisivanesh", canvas.width - 100, 690);
+            drawFounderLabels(ctx, canvas);
+        }
+
+        function drawFounderLabels(ctx, canvas) {
+            ctx.textAlign = "right";
+            ctx.font = "bold 20px 'Inter', sans-serif";
+            ctx.fillStyle = "#888";
+            ctx.fillText("Founder", canvas.width - 100, 720);
+            ctx.font = "16px 'Inter', sans-serif";
+            ctx.fillText("Signature", canvas.width - 100, 745);
+            
+            downloadCanvas(canvas);
+        }
+
+        function downloadCanvas(canvas) {
+            const link = document.createElement('a');
+            link.download = `Certificate-${userName}.png`;
+            link.href = canvas.toDataURL();
+            link.click();
+        }
+    </script>
+</body>
+</html>

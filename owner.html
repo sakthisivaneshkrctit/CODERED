@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Owner Dashboard - CODERED</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+    <style>
+        /* --- PREMIUM DARK THEME --- */
+        :root {
+            --bg-body: #09090b;
+            --bg-card: #141417;
+            --bg-sidebar: #0e0e11;
+            --border: #27272a;
+            --primary: #ff3e55;
+            --accent-blue: #3b82f6;
+            --accent-green: #10b981;
+            --accent-gold: #f59e0b;
+            --text-main: #ffffff;
+            --text-muted: #a1a1aa;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; }
+
+        body {
+            background-color: var(--bg-body); color: var(--text-main);
+            display: flex; height: 100vh; overflow: hidden;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: 280px; background-color: var(--bg-sidebar); border-right: 1px solid var(--border);
+            display: flex; flex-direction: column; padding: 30px; flex-shrink: 0;
+        }
+
+        .brand {
+            display: flex; align-items: center; gap: 12px; font-size: 1.5rem; font-weight: 700;
+            margin-bottom: 50px; color: var(--primary); letter-spacing: -0.5px;
+        }
+
+        .nav-menu { list-style: none; flex-grow: 1; }
+        
+        .nav-link {
+            display: flex; align-items: center; gap: 15px; padding: 16px;
+            text-decoration: none; color: var(--text-muted); border-radius: 12px;
+            font-weight: 500; margin-bottom: 10px; transition: 0.3s; cursor: pointer;
+        }
+        
+        .nav-link:hover, .nav-link.active {
+            background: rgba(255, 62, 85, 0.1); color: var(--primary);
+        }
+        .nav-link.active { border-left: 3px solid var(--primary); }
+
+        .user-profile {
+            margin-top: auto; display: flex; align-items: center; gap: 15px;
+            padding: 15px; background: var(--bg-card); border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+        .avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--primary); display: flex; align-items: center; justify-content: center; font-weight: 700; }
+
+        /* MAIN CONTENT */
+        .main-content {
+            flex-grow: 1; padding: 40px; overflow-y: auto;
+        }
+
+        .section-header { margin-bottom: 40px; }
+        .section-header h1 { font-size: 2.2rem; font-weight: 700; margin-bottom: 8px; }
+        .section-header p { color: var(--text-muted); }
+
+        /* FINANCIAL CARDS */
+        .stats-grid {
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: var(--bg-card); padding: 25px; border-radius: 16px; border: 1px solid var(--border);
+            display: flex; flex-direction: column; justify-content: space-between; height: 160px;
+        }
+
+        .icon-box {
+            width: 45px; height: 45px; border-radius: 10px; display: flex;
+            align-items: center; justify-content: center; font-size: 1.2rem; margin-bottom: 15px;
+        }
+
+        .stat-label { color: var(--text-muted); font-size: 0.9rem; font-weight: 500; }
+        .stat-value { font-size: 2rem; font-weight: 700; color: white; margin-top: 5px; }
+        .stat-sub { font-size: 0.8rem; margin-top: 5px; opacity: 0.7; }
+
+        /* COLORS */
+        .color-blue { color: var(--accent-blue); background: rgba(59, 130, 246, 0.1); }
+        .color-gold { color: var(--accent-gold); background: rgba(245, 158, 11, 0.1); }
+        .color-green { color: var(--accent-green); background: rgba(16, 185, 129, 0.1); }
+        .color-red { color: var(--primary); background: rgba(255, 62, 85, 0.1); }
+
+        /* TEACHER PAYROLL UI (New) */
+        .teacher-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 20px; }
+        .teacher-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 25px; display:flex; flex-direction:column; gap:15px; }
+        
+        .teacher-header { display:flex; align-items:center; gap:15px; border-bottom: 1px solid var(--border); padding-bottom: 15px; }
+        .stat-row { display: flex; justify-content: space-between; font-size: 0.9rem; color: var(--text-muted); margin-bottom: 5px; }
+        .stat-row b { color: white; }
+
+        .pending-box {
+            background: rgba(245, 158, 11, 0.1); border: 1px solid var(--accent-gold);
+            padding: 10px; border-radius: 8px; margin-top: 10px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .pending-label { color: var(--accent-gold); font-size: 0.8rem; font-weight: bold; }
+        .pending-amt { color: var(--accent-gold); font-size: 1.1rem; font-weight: 800; }
+
+        .pay-controls { display: flex; gap: 10px; margin-top: 10px; }
+        .pay-input {
+            background: #09090b; border: 1px solid var(--border); color: white; 
+            padding: 12px; border-radius: 8px; width: 100px; text-align: center; font-weight: bold;
+        }
+        .btn-pay { 
+            flex-grow: 1; padding: 12px; border-radius: 8px; font-weight: 600; cursor: pointer; 
+            border: none; background: var(--accent-green); color: black; transition:0.2s;
+        }
+        .btn-pay:hover { background: #0ea5e9; color: white; }
+        .btn-disabled { background: #333; color: #666; cursor: not-allowed; border: 1px solid #444; }
+
+        /* TABLE */
+        .table-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; }
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; padding: 18px 25px; color: var(--text-muted); border-bottom: 1px solid var(--border); font-weight: 500; font-size: 0.9rem; }
+        td { padding: 20px 25px; border-bottom: 1px solid var(--border); color: white; }
+        tr:last-child td { border-bottom: none; }
+
+        .status-pill { padding: 6px 12px; border-radius: 6px; font-size: 0.8rem; font-weight: 600; display: inline-block; }
+        .pill-paid { background: rgba(59, 130, 246, 0.15); color: var(--accent-blue); }
+        .pill-spu { background: rgba(245, 158, 11, 0.15); color: var(--accent-gold); }
+        .pill-sent { background: rgba(16, 185, 129, 0.15); color: var(--accent-green); }
+
+        /* SECTIONS */
+        .dashboard-section { display: none; animation: fadeIn 0.4s; }
+        .dashboard-section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    </style>
+</head>
+<body>
+
+    <nav class="sidebar">
+        <div class="brand"><i class="fas fa-layer-group"></i> CODERED</div>
+        <ul class="nav-menu">
+            <li class="nav-item"><div class="nav-link active" onclick="switchTab('dashboard')"><i class="fas fa-chart-pie"></i> Financials</div></li>
+            <li class="nav-item"><div class="nav-link" onclick="switchTab('salary')"><i class="fas fa-money-bill-wave"></i> Payroll</div></li>
+            <li class="nav-item"><div class="nav-link" onclick="switchTab('students')"><i class="fas fa-users"></i> Student Ledger</div></li>
+            <li class="nav-item"><a href="owner_courses.html" class="nav-link"><i class="fas fa-book"></i> Edit Courses</a></li>
+            <li class="nav-item"><a href="login.html" class="nav-link" style="margin-top:auto;"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+        </ul>
+        <div class="user-profile">
+            <div class="avatar">O</div>
+            <div>
+                <div style="font-weight:600; font-size:0.9rem;">Owner Admin</div>
+                <div style="font-size:0.75rem; color:var(--text-muted);">Side Business</div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        
+        <div id="tab-dashboard" class="dashboard-section active">
+            <div class="section-header">
+                <h1>Revenue & Profit</h1>
+                <p>Tracking SPU Investment, Student Cashbacks, and Salaries.</p>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="icon-box color-blue"><i class="fas fa-wallet"></i></div>
+                    <div><div class="stat-label">Total Revenue</div><div class="stat-value" id="val-revenue">₹0</div></div>
+                </div>
+                <div class="stat-card" style="border-color:var(--accent-gold)">
+                    <div class="icon-box color-gold"><i class="fas fa-university"></i></div>
+                    <div><div class="stat-label">SPU Stock (50%)</div><div class="stat-value" style="color:var(--accent-gold)" id="val-spu">₹0</div></div>
+                </div>
+                <div class="stat-card">
+                    <div class="icon-box color-red"><i class="fas fa-users"></i></div>
+                    <div><div class="stat-label">Salary Expenses</div><div class="stat-value" id="val-salary" style="color:var(--primary)">₹0</div></div>
+                </div>
+                <div class="stat-card">
+                    <div class="icon-box color-green"><i class="fas fa-chart-line"></i></div>
+                    <div>
+                        <div class="stat-label">Net Cash in Hand</div>
+                        <div class="stat-value" id="val-profit">₹0</div>
+                        <div class="stat-sub">Rev - SPU - Payouts - Salary</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="tab-salary" class="dashboard-section">
+            <div class="section-header">
+                <h1>Teacher Payroll</h1>
+                <p>Verify video uploads and release payments (Rate: ₹100/Video).</p>
+            </div>
+            
+            <div class="teacher-grid" id="teacher-container">
+                </div>
+        </div>
+
+        <div id="tab-students" class="dashboard-section">
+            <div class="section-header">
+                <h1>Student Ledger</h1>
+                <p>Tracking completion status and automatic 50% split.</p>
+            </div>
+            <div class="table-card">
+                <table>
+                    <thead><tr><th>Student</th><th>Total Paid</th><th>SPU Share (50%)</th><th>Status</th><th>Action</th></tr></thead>
+                    <tbody id="student-table-body"></tbody>
+                </table>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        // --- 1. LOAD DATA ---
+        let allUsers = JSON.parse(localStorage.getItem('codered_all_users') || "[]");
+        let teachers = JSON.parse(localStorage.getItem('codered_teachers')) || {
+            't1': { name: 'Mr. Sharma', subject: 'Python', uploads: 0, paid_total: 0, color: '#e67e22' },
+            't2': { name: 'Ms. Priya', subject: 'C Prog', uploads: 0, paid_total: 0, color: '#9b59b6' },
+            't3': { name: 'Mr. David', subject: 'Web Dev', uploads: 0, paid_total: 0, color: '#3b82f6' }
+        };
+
+        // --- 2. FINANCIAL CALCULATIONS ---
+        let totalRevenue = 0;
+        let spuTotal = 0;
+        let studentPayouts = 0;
+        let salaryPaidTotal = 0;
+
+        // Student Data
+        const studentTable = document.getElementById('student-table-body');
+        studentTable.innerHTML = "";
+
+        allUsers.forEach(u => {
+            if(u.paid === true) {
+                totalRevenue += 2000;
+                spuTotal += 1000; 
+
+                let status = '<span class="status-pill" style="background:#333; color:#aaa">In Progress</span>';
+                let action = '<span style="color:var(--accent-gold)">₹1,000 Pending</span>';
+
+                if(u.completed === true) {
+                    studentPayouts += 1000;
+                    status = '<span class="status-pill pill-sent">Completed</span>';
+                    action = '<span style="color:var(--accent-green)">₹1,000 Sent</span>';
+                }
+
+                studentTable.innerHTML += `
+                    <tr>
+                        <td>${u.name}<br><span style="font-size:0.8rem; color:#666">${u.email}</span></td>
+                        <td><span class="status-pill pill-paid">₹2,000</span></td>
+                        <td><span class="status-pill pill-spu">₹1,000</span></td>
+                        <td>${status}</td>
+                        <td>${action}</td>
+                    </tr>
+                `;
+            }
+        });
+
+        // Teacher Data & Render
+        const tContainer = document.getElementById('teacher-container');
+        tContainer.innerHTML = "";
+
+        Object.keys(teachers).forEach(key => {
+            const t = teachers[key];
+            
+            // LOGIC: Total Earned = Uploads * 100. Due = Earned - Paid.
+            const totalEarned = (t.uploads || 0) * 100;
+            const alreadyPaid = t.paid_total || 0;
+            const dueAmount = totalEarned - alreadyPaid;
+            
+            salaryPaidTotal += alreadyPaid; // Add to global expense
+
+            // UI State
+            const hasDue = dueAmount > 0;
+            const btnClass = hasDue ? 'btn-pay' : 'btn-pay btn-disabled';
+            const btnText = hasDue ? `Verify & Transfer` : 'All Paid';
+            const inputState = hasDue ? '' : 'disabled';
+            const inputVal = hasDue ? dueAmount : 0;
+
+            tContainer.innerHTML += `
+                <div class="teacher-card">
+                    <div class="teacher-header">
+                        <div class="avatar" style="background:${t.color || '#555'}">${key.toUpperCase()}</div>
+                        <div><h4>${t.name}</h4><p style="font-size:0.8rem; color:#888">${t.subject}</p></div>
+                    </div>
+                    
+                    <div>
+                        <div class="stat-row"><span>Total Uploads</span> <b>${t.uploads}</b></div>
+                        <div class="stat-row"><span>Total Earnings (₹100/vid)</span> <b>₹${totalEarned}</b></div>
+                        <div class="stat-row"><span>Already Paid</span> <b>₹${alreadyPaid}</b></div>
+                    </div>
+
+                    <div class="pending-box">
+                        <span class="pending-label">PENDING APPROVAL</span>
+                        <span class="pending-amt">₹${dueAmount}</span>
+                    </div>
+
+                    <div class="pay-controls">
+                        <input type="number" id="pay-amount-${key}" class="pay-input" value="${inputVal}" ${inputState} min="0" max="${dueAmount}">
+                        <button class="${btnClass}" onclick="processPayment('${key}', ${dueAmount})">${btnText}</button>
+                    </div>
+                </div>
+            `;
+        });
+
+        // Net Profit Calculation
+        let netProfit = totalRevenue - (spuTotal + studentPayouts + salaryPaidTotal);
+
+        // Update Dashboard Stats
+        document.getElementById('val-revenue').innerText = "₹" + totalRevenue.toLocaleString();
+        document.getElementById('val-spu').innerText = "₹" + spuTotal.toLocaleString();
+        document.getElementById('val-salary').innerText = "₹" + salaryPaidTotal.toLocaleString();
+        
+        const pEl = document.getElementById('val-profit');
+        pEl.innerText = "₹" + netProfit.toLocaleString();
+        pEl.style.color = netProfit >= 0 ? "var(--accent-green)" : "var(--primary)";
+
+        // --- 3. PAYMENT FUNCTION ---
+        function processPayment(id, maxDue) {
+            if(maxDue <= 0) return alert("No pending dues for this teacher.");
+
+            const inputEl = document.getElementById(`pay-amount-${id}`);
+            const amountToPay = parseInt(inputEl.value);
+
+            if (!amountToPay || amountToPay <= 0) return alert("Enter valid amount");
+            if (amountToPay > maxDue) return alert(`Cannot pay more than pending amount (₹${maxDue}).`);
+
+            if(confirm(`Approve transfer of ₹${amountToPay} to teacher?`)) {
+                // Update Teacher Data
+                teachers[id].paid_total = (teachers[id].paid_total || 0) + amountToPay;
+                
+                // Save
+                localStorage.setItem('codered_teachers', JSON.stringify(teachers));
+                
+                // Reload
+                location.reload();
+            }
+        }
+
+        function switchTab(id) {
+            document.querySelectorAll('.dashboard-section').forEach(el => el.classList.remove('active'));
+            document.getElementById('tab-'+id).classList.add('active');
+            document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CODERED - Portal Access</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+    <style>
+        /* CODERED THEME VARIABLES */
+        :root {
+            --bg-body: #050505;
+            --bg-card: #0f1014;
+            --border: #1f1f23;
+            --primary: #ff3e55; /* The Red Accent */
+            --text-main: #ffffff;
+            --text-muted: #8b949e;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        
+        body { 
+            background-color: var(--bg-body); 
+            color: var(--text-main); 
+            height: 100vh; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            background-image: radial-gradient(circle at 50% -20%, rgba(255, 62, 85, 0.1) 0%, transparent 40%);
+        }
+
+        .login-wrapper {
+            width: 100%; max-width: 420px;
+            padding: 20px;
+        }
+
+        .brand-logo {
+            text-align: center; font-size: 1.8rem; font-weight: 800; 
+            color: var(--primary); margin-bottom: 10px; letter-spacing: -1px;
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+        }
+
+        .auth-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+        }
+
+        .tab-header {
+            display: flex; border-bottom: 1px solid var(--border); margin-bottom: 30px;
+        }
+        
+        .tab-btn {
+            flex: 1; padding: 15px; text-align: center; cursor: pointer;
+            color: var(--text-muted); font-weight: 600; font-size: 0.95rem;
+            border-bottom: 2px solid transparent; transition: 0.3s;
+        }
+        
+        .tab-btn.active { color: white; border-bottom-color: var(--primary); }
+
+        .form-group { margin-bottom: 20px; }
+        .form-label { display: block; color: var(--text-muted); font-size: 0.85rem; margin-bottom: 8px; }
+        
+        .form-input {
+            width: 100%; background: #09090b; border: 1px solid var(--border);
+            color: white; padding: 12px 16px; border-radius: 8px; outline: none;
+            transition: 0.2s; font-size: 0.95rem;
+        }
+        
+        .form-input:focus { border-color: var(--primary); }
+
+        .btn-primary {
+            width: 100%; background: var(--primary); color: white; border: none;
+            padding: 14px; border-radius: 8px; font-weight: 600; cursor: pointer;
+            font-size: 1rem; transition: 0.2s;
+        }
+        .btn-primary:hover { background: #e0354a; }
+
+        .staff-link {
+            text-align: center; margin-top: 25px; padding-top: 20px;
+            border-top: 1px solid var(--border); font-size: 0.9rem;
+            color: var(--text-muted); cursor: pointer; transition: 0.2s;
+        }
+        .staff-link:hover { color: var(--primary); }
+
+        /* Staff Modal */
+        .modal-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85); backdrop-filter: blur(5px);
+            align-items: center; justify-content: center; z-index: 100;
+        }
+        .modal-box {
+            background: var(--bg-card); border: 1px solid var(--border);
+            padding: 30px; border-radius: 16px; width: 350px;
+        }
+        
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+
+    <div class="login-wrapper">
+        <div class="brand-logo"><i class="fas fa-bolt"></i> CODERED</div>
+        <p style="text-align:center; color:#8b949e; margin-bottom:30px;">Learn. Code. Battle.</p>
+
+        <div class="auth-card">
+            <div class="tab-header">
+                <div class="tab-btn active" onclick="switchForm('login')">Login</div>
+                <div class="tab-btn" onclick="switchForm('signup')">Sign Up</div>
+            </div>
+
+            <form id="form-login" onsubmit="handleUserLogin(event)">
+                <div class="form-group">
+                    <label class="form-label">Email Address</label>
+                    <input type="email" id="l-email" class="form-input" placeholder="student@example.com" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input type="password" id="l-pass" class="form-input" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="btn-primary">Enter Dashboard</button>
+            </form>
+
+            <form id="form-signup" class="hidden" onsubmit="handleUserSignup(event)">
+                <div class="form-group">
+                    <label class="form-label">Full Name</label>
+                    <input type="text" id="s-name" class="form-input" placeholder="Alex Developer" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Email Address</label>
+                    <input type="email" id="s-email" class="form-input" placeholder="alex@example.com" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input type="password" id="s-pass" class="form-input" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="btn-primary">Create Account</button>
+            </form>
+
+            <div class="staff-link" onclick="openStaffModal()">
+                <i class="fas fa-lock"></i> Access for Owner & Teachers
+            </div>
+        </div>
+    </div>
+
+    <div id="staff-modal" class="modal-overlay">
+        <div class="modal-box">
+            <h3 style="margin-bottom:20px; color:white;">Staff Portal</h3>
+            
+            <div class="form-group">
+                <label class="form-label">Select Identity</label>
+                <select id="staff-role" class="form-input" style="cursor:pointer;">
+                    <option value="owner">Owner (Admin)</option>
+                    <option value="t1">Mr. Sharma (Python)</option>
+                    <option value="t2">Ms. Priya (C Prog)</option>
+                    <option value="t3">Mr. David (Web)</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Access Code</label>
+                <input type="password" id="staff-pass" class="form-input" placeholder="••••••">
+            </div>
+
+            <button onclick="handleStaffLogin()" class="btn-primary" style="margin-bottom:15px;">Authenticate</button>
+            <button onclick="document.getElementById('staff-modal').style.display='none'" style="width:100%; background:transparent; border:none; color:#8b949e; cursor:pointer;">Cancel</button>
+        </div>
+    </div>
+
+    <script>
+        // 1. TABS
+        function switchForm(type) {
+            const loginForm = document.getElementById('form-login');
+            const signupForm = document.getElementById('form-signup');
+            const tabs = document.querySelectorAll('.tab-btn');
+
+            if (type === 'login') {
+                loginForm.classList.remove('hidden');
+                signupForm.classList.add('hidden');
+                tabs[0].classList.add('active');
+                tabs[1].classList.remove('active');
+            } else {
+                loginForm.classList.add('hidden');
+                signupForm.classList.remove('hidden');
+                tabs[0].classList.remove('active');
+                tabs[1].classList.add('active');
+            }
+        }
+
+        // 2. USER LOGIN
+        function handleUserLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('l-email').value;
+            const pass = document.getElementById('l-pass').value;
+            let users = JSON.parse(localStorage.getItem('codered_all_users') || "[]");
+            const user = users.find(u => u.email === email && u.password === pass);
+
+            if(user) {
+                localStorage.setItem('codered_username', user.name);
+                window.location.href = 'index.html';
+            } else { alert("Invalid Credentials"); }
+        }
+
+        // 3. USER SIGNUP
+        function handleUserSignup(e) {
+            e.preventDefault();
+            const name = document.getElementById('s-name').value;
+            const email = document.getElementById('s-email').value;
+            const pass = document.getElementById('s-pass').value;
+
+            let users = JSON.parse(localStorage.getItem('codered_all_users') || "[]");
+            users.push({ name, email, password: pass, paid: false, joinDate: new Date().toLocaleDateString() });
+            localStorage.setItem('codered_all_users', JSON.stringify(users));
+            
+            alert("Account Created! Please Login.");
+            switchForm('login');
+        }
+
+        // 4. STAFF LOGIN
+        function openStaffModal() { document.getElementById('staff-modal').style.display = 'flex'; }
+        
+        function handleStaffLogin() {
+            const role = document.getElementById('staff-role').value;
+            const pass = document.getElementById('staff-pass').value;
+
+            if(pass === "123456789") {
+                if(role === 'owner') {
+                    window.location.href = 'owner.html';
+                } else {
+                    localStorage.setItem('codered_current_teacher', role);
+                    window.location.href = 'teacher.html';
+                }
+            } else { alert("Access Denied"); }
+        }
+    </script>
+</body>
+</html>

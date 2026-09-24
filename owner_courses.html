@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Courses - CODERED</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+    <style>
+        /* CORE STYLES */
+        :root { --bg-dark: #0f1014; --bg-card: #18191f; --bg-sidebar: #0a0b0d; --accent-red: #ff3e55; --accent-blue: #2d8cf0; --accent-green: #2ecc71; --text-main: #ffffff; --text-muted: #8b949e; --border-color: #2f333a; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background-color: var(--bg-dark); color: var(--text-main); display: flex; height: 100vh; overflow: hidden; }
+        
+        .sidebar { width: 260px; background-color: var(--bg-sidebar); border-right: 1px solid var(--border-color); display: flex; flex-direction: column; padding: 20px; flex-shrink: 0; }
+        .brand { display: flex; align-items: center; gap: 10px; font-size: 1.2rem; font-weight: 700; margin-bottom: 40px; color: var(--accent-red); }
+        .nav-menu { list-style: none; flex-grow: 1; }
+        .nav-link { display: flex; align-items: center; gap: 12px; padding: 12px 16px; text-decoration: none; color: var(--text-muted); border-radius: 8px; margin-bottom: 5px; cursor: pointer; transition: 0.3s; }
+        .nav-link:hover { background-color: rgba(255, 255, 255, 0.05); color: white; }
+        .nav-link.active { background-color: rgba(255, 62, 85, 0.1); color: var(--accent-red); border-left: 3px solid var(--accent-red); }
+        .user-profile { margin-top: auto; display: flex; align-items: center; gap: 12px; padding: 15px; background-color: var(--bg-card); border-radius: 12px; border-top: 1px solid var(--border-color); }
+        .avatar { width: 40px; height: 40px; border-radius: 50%; background-color: var(--accent-red); display: flex; align-items: center; justify-content: center; font-weight: bold; }
+
+        .main-content { flex-grow: 1; padding: 30px; overflow-y: auto; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .add-btn { background: var(--accent-red); color: white; border: none; padding: 10px 20px; border-radius: 6px; font-weight: bold; cursor: pointer; }
+        .add-btn:hover { background: #d63044; }
+
+        .course-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+        .course-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; position: relative;}
+        
+        .card-banner { height: 100px; display: flex; align-items: center; justify-content: center; position: relative; }
+        .style-green { background: linear-gradient(135deg, #2ecc71 0%, #f1c40f 100%); }
+        .style-blue { background: linear-gradient(135deg, #2d8cf0 0%, #3498db 100%); }
+        .style-purple { background: linear-gradient(135deg, #8e44ad 0%, #9b59b6 100%); }
+        .style-red { background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); }
+        
+        .card-body { padding: 20px; flex-grow: 1; display: flex; flex-direction: column; }
+        .card-info { display: flex; justify-content: space-between; margin-top: 20px; color: var(--text-muted); font-size: 0.9rem; margin-bottom: 20px; }
+        .card-price { color: var(--text-main); font-weight: bold; font-size: 1.1rem; }
+        
+        .action-row { display: flex; gap: 10px; margin-top: auto; }
+        .btn-edit { flex: 1; background: transparent; border: 1px solid var(--border-color); color: white; padding: 8px; border-radius: 6px; cursor: pointer; transition: 0.3s; }
+        .btn-edit:hover { border-color: var(--accent-blue); color: var(--accent-blue); }
+        
+        .btn-delete { background: rgba(255, 62, 85, 0.1); border: 1px solid var(--accent-red); color: var(--accent-red); padding: 8px 12px; border-radius: 6px; cursor: pointer; }
+        .btn-delete:hover { background: var(--accent-red); color: white; }
+
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); align-items: center; justify-content: center; z-index: 1000; }
+        .modal-content { background: var(--bg-card); padding: 30px; border-radius: 12px; width: 400px; border: 1px solid var(--accent-blue); }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; color: var(--text-muted); margin-bottom: 5px; font-size: 0.9rem; }
+        .form-control { width: 100%; background: #0f1014; border: 1px solid var(--border-color); color: white; padding: 10px; border-radius: 6px; }
+        .btn-save { background: var(--accent-green); color: black; width: 100%; padding: 10px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+    </style>
+</head>
+<body>
+
+    <nav class="sidebar">
+        <div class="brand"><i class="fas fa-bolt"></i> CODERED</div>
+        <ul class="nav-menu">
+            <li class="nav-item"><a href="owner.html" class="nav-link"><i class="fas fa-chart-line"></i> Dashboard</a></li>
+            <li class="nav-item"><div class="nav-link active"><i class="fas fa-book"></i> Edit Courses</div></li>
+        </ul>
+        <div class="user-profile"><div class="avatar">O</div><div><h4>Owner</h4><p>Admin Access</p></div></div>
+    </nav>
+
+    <main class="main-content">
+        <div class="header">
+            <h1>Manage Courses</h1>
+            <button class="add-btn" onclick="openAddModal()">+ Add New Course</button>
+        </div>
+
+        <div class="course-grid" id="course-container">
+            </div>
+    </main>
+
+    <div id="course-modal" class="modal">
+        <div class="modal-content">
+            <h3 id="modal-title" style="margin-bottom:20px;">Edit Course</h3>
+            
+            <input type="hidden" id="course-id">
+            
+            <div class="form-group">
+                <label>Course Title</label>
+                <input type="text" id="inp-title" class="form-control" placeholder="e.g. Java Mastery">
+            </div>
+            <div class="form-group">
+                <label>Description</label>
+                <input type="text" id="inp-desc" class="form-control" placeholder="Short description...">
+            </div>
+            <div class="form-group">
+                <label>Price (₹)</label>
+                <input type="number" id="inp-price" class="form-control" placeholder="2000">
+            </div>
+            <div class="form-group">
+                <label>Card Color Style</label>
+                <select id="inp-style" class="form-control">
+                    <option value="style-green">Green Theme</option>
+                    <option value="style-blue">Blue Theme</option>
+                    <option value="style-purple">Purple Theme</option>
+                    <option value="style-red">Red Theme</option>
+                </select>
+            </div>
+
+            <button class="btn-save" onclick="saveCourse()">Save</button>
+            <button onclick="document.getElementById('course-modal').style.display='none'" style="background:transparent; color:#888; border:none; width:100%; margin-top:10px; cursor:pointer;">Cancel</button>
+        </div>
+    </div>
+
+    <script>
+        // --- 1. INITIALIZE DATA ---
+        function initDB() {
+            let db = localStorage.getItem('codered_courses_data');
+            if (!db) {
+                // Default Courses
+                const defaults = {
+                    'py': { id: 'py', title: "Python Mastery", desc: "Master Python from basics.", price: 2000, style: 'style-green', icon: 'fa-python' },
+                    'c': { id: 'c', title: "C Programming", desc: "Low-level power applications.", price: 2000, style: 'style-blue', icon: 'fa-microchip' }
+                };
+                localStorage.setItem('codered_courses_data', JSON.stringify(defaults));
+                return defaults;
+            }
+            return JSON.parse(db);
+        }
+
+        // --- 2. RENDER COURSES ---
+        function loadUI() {
+            const coursesDB = initDB();
+            const container = document.getElementById('course-container');
+            container.innerHTML = "";
+
+            if(Object.keys(coursesDB).length === 0) {
+                container.innerHTML = "<p style='color:#666; grid-column:span 2; text-align:center;'>No courses available. Add one!</p>";
+                return;
+            }
+
+            Object.keys(coursesDB).forEach(key => {
+                const c = coursesDB[key];
+                
+                const html = `
+                    <div class="course-card">
+                        <div class="card-banner ${c.style}">
+                            <i class="fas ${c.icon || 'fa-book'} fa-3x" style="color:white"></i>
+                        </div>
+                        <div class="card-body">
+                            <h3>${c.title}</h3>
+                            <p style="color:#8b949e; font-size:0.9rem; margin-top:5px;">${c.desc}</p>
+                            <div class="card-info">
+                                <span><i class="fas fa-book-open"></i> 20 Lessons</span>
+                                <span class="card-price">₹${c.price}</span>
+                            </div>
+                            <div class="action-row">
+                                <button class="btn-edit" onclick="openEditModal('${c.id}')"><i class="fas fa-edit"></i> Edit</button>
+                                <button class="btn-delete" onclick="deleteCourse('${c.id}')"><i class="fas fa-trash"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += html;
+            });
+        }
+        
+        loadUI(); // Load on start
+
+        // --- 3. ADD NEW COURSE LOGIC ---
+        function openAddModal() {
+            // 1. Reset Title
+            document.getElementById('modal-title').innerText = "Add New Course";
+            
+            // 2. Generate UNIQUE ID for new course
+            const uniqueID = "course_" + Date.now(); 
+            document.getElementById('course-id').value = uniqueID;
+            
+            // 3. Clear Input Fields
+            document.getElementById('inp-title').value = "";
+            document.getElementById('inp-desc').value = "";
+            document.getElementById('inp-price').value = "";
+            document.getElementById('inp-style').value = "style-green"; // Reset style
+            
+            // 4. Show Modal
+            document.getElementById('course-modal').style.display = 'flex';
+        }
+
+        // --- 4. EDIT EXISTING COURSE LOGIC ---
+        function openEditModal(id) {
+            const coursesDB = initDB();
+            const c = coursesDB[id];
+            
+            // 1. Set Title
+            document.getElementById('modal-title').innerText = "Edit Course";
+            
+            // 2. Load Existing ID
+            document.getElementById('course-id').value = id;
+            
+            // 3. Fill Inputs with Data
+            document.getElementById('inp-title').value = c.title;
+            document.getElementById('inp-desc').value = c.desc;
+            document.getElementById('inp-price').value = c.price;
+            document.getElementById('inp-style').value = c.style;
+            
+            // 4. Show Modal
+            document.getElementById('course-modal').style.display = 'flex';
+        }
+
+        // --- 5. SAVE FUNCTION (Handles both Add & Edit) ---
+        function saveCourse() {
+            let coursesDB = initDB();
+            
+            const id = document.getElementById('course-id').value;
+            const title = document.getElementById('inp-title').value;
+            const desc = document.getElementById('inp-desc').value;
+            const price = document.getElementById('inp-price').value;
+            const style = document.getElementById('inp-style').value;
+
+            if(!title || !price) { alert("Please enter Title and Price"); return; }
+
+            // Create or Update Object in DB
+            coursesDB[id] = {
+                id: id,
+                title: title,
+                desc: desc,
+                price: price,
+                style: style,
+                icon: 'fa-book' // Default icon for new courses
+            };
+
+            // Save to LocalStorage
+            localStorage.setItem('codered_courses_data', JSON.stringify(coursesDB));
+            
+            // Close & Refresh
+            document.getElementById('course-modal').style.display = 'none';
+            loadUI();
+            alert("Saved Successfully!");
+        }
+
+        // --- 6. DELETE LOGIC ---
+        function deleteCourse(id) {
+            if(confirm("Delete this course? Students who bought it will lose access.")) {
+                let coursesDB = initDB();
+                
+                // Remove specific key
+                delete coursesDB[id];
+                
+                // Save updated DB
+                localStorage.setItem('codered_courses_data', JSON.stringify(coursesDB));
+                
+                // Clean up unlock status for this course ID
+                localStorage.removeItem('codered_status_' + id);
+
+                loadUI();
+            }
+        }
+    </script>
+</body>
+</html>

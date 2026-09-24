@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CODERED - Sports Arena</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+    <style>
+        /* --- CORE STYLES --- */
+        :root {
+            --bg-dark: #0f1014;
+            --bg-card: #18191f;
+            --bg-sidebar: #0a0b0d;
+            --accent-red: #ff3e55;
+            --accent-blue: #2d8cf0;
+            --accent-green: #2ecc71;
+            --accent-purple: #9b59b6;
+            --text-main: #ffffff;
+            --text-muted: #8b949e;
+            --border-color: #2f333a;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* --- SIDEBAR --- */
+        .sidebar {
+            width: 260px;
+            background-color: var(--bg-sidebar);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            flex-shrink: 0;
+        }
+
+        .brand {
+            display: flex; align-items: center; gap: 10px;
+            font-size: 1.2rem; font-weight: 700; margin-bottom: 40px;
+            color: var(--accent-red);
+        }
+
+        .nav-menu { list-style: none; flex-grow: 1; }
+        
+        .nav-link {
+            display: flex; align-items: center; gap: 12px;
+            padding: 12px 16px; text-decoration: none;
+            color: var(--text-muted); border-radius: 8px;
+            transition: all 0.3s ease; font-weight: 500; margin-bottom: 5px;
+        }
+
+        .nav-link:hover { background-color: rgba(255, 255, 255, 0.05); color: white; }
+        .nav-link.active { background-color: rgba(155, 89, 182, 0.1); color: var(--accent-purple); border-left: 3px solid var(--accent-purple); }
+        
+        .wallet-badge { margin-left: auto; color: var(--accent-green); font-size: 0.9rem; }
+
+        .user-profile {
+            margin-top: auto; display: flex; align-items: center; gap: 12px;
+            padding: 15px; background-color: var(--bg-card); border-radius: 12px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .avatar {
+            width: 40px; height: 40px; border-radius: 50%;
+            background-color: var(--accent-red);
+            display: flex; align-items: center; justify-content: center; font-weight: bold;
+        }
+
+        /* --- MAIN CONTENT --- */
+        .main-content {
+            flex-grow: 1;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        /* --- 1. GAME MENU --- */
+        .game-menu {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+        }
+
+        .game-card {
+            background-color: var(--bg-card);
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            transition: transform 0.3s, border-color 0.3s;
+            cursor: pointer;
+            position: relative;
+        }
+        .game-card:hover { transform: translateY(-5px); border-color: var(--accent-purple); }
+
+        .game-banner {
+            height: 120px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 3rem; color: white;
+        }
+        
+        .bg-cricket { background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); }
+        .bg-football { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); }
+        .bg-hockey { background: linear-gradient(135deg, #cb2d3e 0%, #ef473a 100%); }
+        .bg-tennis { background: linear-gradient(135deg, #fce38a 0%, #f38181 100%); }
+        .bg-volleyball { background: linear-gradient(135deg, #8e2de2 0%, #4a00e0 100%); }
+
+        .game-info { padding: 20px; }
+        .game-title { font-size: 1.2rem; font-weight: bold; margin-bottom: 5px; }
+        .play-btn { 
+            width: 100%; padding: 10px; background: rgba(255,255,255,0.1); 
+            border: 1px solid var(--border-color); color: white; border-radius: 6px; cursor: pointer;
+        }
+
+        /* --- 2. MODE SELECTION --- */
+        #mode-selection {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            animation: fadeIn 0.4s;
+        }
+
+        .mode-container { display: flex; gap: 30px; margin-top: 30px; }
+
+        .mode-card {
+            width: 250px; padding: 30px; background: var(--bg-card); border-radius: 16px;
+            border: 2px solid var(--border-color); text-align: center; cursor: pointer;
+            transition: all 0.3s;
+        }
+        .mode-card:hover { border-color: var(--accent-green); transform: scale(1.05); }
+        .mode-icon { font-size: 3rem; margin-bottom: 20px; color: var(--accent-blue); }
+        
+        /* --- 3. ARENA --- */
+        #game-arena {
+            display: none;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .arena-header {
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;
+            background: var(--bg-card); padding: 15px 25px; border-radius: 12px; border: 1px solid var(--border-color);
+        }
+
+        /* Animation Field */
+        .field-display {
+            height: 200px;
+            background: #1e1e1e;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+            display: flex; align-items: center; justify-content: center;
+            border: 2px solid #333;
+        }
+        .sport-object { font-size: 3rem; position: absolute; left: 10%; transition: all 0.5s ease-in; z-index: 10; }
+        .sport-target { font-size: 3rem; position: absolute; right: 10%; opacity: 0.5; }
+        
+        .score-anim { left: 80% !important; transform: rotate(360deg) scale(1.5); }
+        .fail-anim { left: 40% !important; opacity: 0; transform: translateY(50px); }
+
+        .score-msg {
+            position: absolute; font-size: 4rem; font-weight: 900; color: var(--accent-green); 
+            text-shadow: 0 0 20px black; opacity: 0; pointer-events: none; z-index: 20;
+        }
+        .show-score { animation: popScore 1s ease forwards; }
+        @keyframes popScore { 0% { opacity: 0; transform: scale(0.5); } 50% { opacity: 1; transform: scale(1.2); } 100% { opacity: 0; transform: scale(1.5); } }
+
+        /* --- PERFECT SHADOW EDITOR --- */
+        .code-zone { flex-grow: 1; display: flex; flex-direction: column; gap: 15px; }
+
+        .task-card {
+            background: var(--bg-card); padding: 20px; border-radius: 12px; border: 1px solid var(--border-color);
+            position: relative;
+        }
+
+        /* Container for overlapping text */
+        .editor-container {
+            position: relative;
+            background: #0f1014;
+            border: 1px solid #333;
+            border-radius: 8px;
+            height: 80px; /* Fixed height for single line code */
+            display: flex;
+            align-items: center;
+            padding: 0 15px;
+            overflow: hidden;
+        }
+
+        /* Common font style for perfect overlap */
+        .editor-font {
+            font-family: 'Courier New', monospace;
+            font-size: 1.2rem;
+            letter-spacing: 1px;
+            line-height: 1.5;
+        }
+
+        /* Shadow (Ghost) Text */
+        #shadow-text {
+            position: absolute;
+            top: 25px; left: 15px;
+            color: #444; /* Dark Grey */
+            pointer-events: none;
+            white-space: pre;
+            z-index: 1;
+        }
+
+        /* User Input */
+        .input-box {
+            position: absolute;
+            top: 25px; left: 15px;
+            width: 100%;
+            background: transparent;
+            border: none;
+            color: var(--accent-green); /* Green text when typing */
+            outline: none;
+            z-index: 2;
+        }
+
+        /* Human Mode Question Display */
+        #human-question {
+            background: rgba(45, 140, 240, 0.1); border: 1px solid var(--accent-blue);
+            color: var(--accent-blue); padding: 15px; border-radius: 6px; margin-bottom: 20px;
+            font-family: 'Inter', sans-serif; font-weight: 600; text-align: center;
+            display: none;
+        }
+
+        .action-area { display: flex; justify-content: space-between; align-items: center; margin-top: 15px; }
+        
+        .hint-btn {
+            background: transparent; color: #f1c40f; border: 1px solid #f1c40f;
+            padding: 8px 15px; border-radius: 6px; cursor: pointer; font-size: 0.9rem;
+        }
+        .hint-btn:hover { background: rgba(241, 196, 15, 0.1); }
+
+        .submit-btn {
+            background: var(--accent-green); color: black; padding: 10px 30px; border: none;
+            border-radius: 6px; font-weight: bold; cursor: pointer;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85); z-index: 100; display: none;
+            align-items: center; justify-content: center; backdrop-filter: blur(5px);
+        }
+        .modal-card {
+            background: var(--bg-card); border: 1px solid var(--accent-green);
+            padding: 40px; border-radius: 20px; text-align: center; width: 400px;
+        }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    </style>
+</head>
+<body>
+
+    <nav class="sidebar">
+        <div class="brand"><i class="fas fa-bolt"></i> CODERED</div>
+        <ul class="nav-menu">
+            <li class="nav-item"><a href="index.html" class="nav-link"><i class="fas fa-home"></i> Home</a></li>
+            <li class="nav-item"><a href="courses.html" class="nav-link"><i class="fas fa-book-open"></i> Courses</a></li>
+            <li class="nav-item"><a href="mycorse.html" class="nav-link"><i class="fas fa-folder"></i> My Courses</a></li>
+            <li class="nav-item"><a href="game.html" class="nav-link active"><i class="fas fa-gamepad"></i> Games</a></li>
+            <li class="nav-item">
+                <a href="wallet.html" class="nav-link">
+                    <i class="fas fa-wallet"></i> Wallet
+                    <span class="wallet-badge" id="sidebar-wallet">₹4,500</span>
+                </a>
+            </li>
+        </ul>
+        <div class="user-profile">
+            <div class="avatar" id="sidebar-avatar">U</div>
+            <div>
+                <h4 id="sidebar-name">Loading...</h4>
+                <p style="font-size:0.8rem; color:#8b949e;">Student</p>
+            </div>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        
+        <div id="game-menu">
+            <h1 style="margin-bottom: 10px;">Sports Coding Arcade</h1>
+            <p style="color: var(--text-muted); margin-bottom: 30px;">Select a sport to begin.</p>
+            
+            <div class="game-menu">
+                <div class="game-card" onclick="showModeSelect('Cricket')">
+                    <div class="game-banner bg-cricket"><i class="fas fa-baseball-ball"></i></div>
+                    <div class="game-info">
+                        <div class="game-title">Code Cricket</div>
+                        <button class="play-btn">Select</button>
+                    </div>
+                </div>
+                <div class="game-card" onclick="showModeSelect('Football')">
+                    <div class="game-banner bg-football"><i class="fas fa-futbol"></i></div>
+                    <div class="game-info">
+                        <div class="game-title">Syntax Soccer</div>
+                        <button class="play-btn">Select</button>
+                    </div>
+                </div>
+                <div class="game-card" onclick="showModeSelect('Hockey')">
+                    <div class="game-banner bg-hockey"><i class="fas fa-hockey-puck"></i></div>
+                    <div class="game-info">
+                        <div class="game-title">Hockey Hustle</div>
+                        <button class="play-btn">Select</button>
+                    </div>
+                </div>
+                <div class="game-card" onclick="showModeSelect('Tennis')">
+                    <div class="game-banner bg-tennis"><i class="fas fa-table-tennis"></i></div>
+                    <div class="game-info">
+                        <div class="game-title">Tennis Typer</div>
+                        <button class="play-btn">Select</button>
+                    </div>
+                </div>
+                <div class="game-card" onclick="showModeSelect('Volleyball')">
+                    <div class="game-banner bg-volleyball"><i class="fas fa-volleyball-ball"></i></div>
+                    <div class="game-info">
+                        <div class="game-title">Volley Vars</div>
+                        <button class="play-btn">Select</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="mode-selection">
+            <h1>Select Difficulty</h1>
+            <p style="color: var(--text-muted);">Choose your challenge.</p>
+            
+            <div class="mode-container">
+                <div class="mode-card" onclick="startGame('shadow')">
+                    <div class="mode-icon"><i class="fas fa-ghost"></i></div>
+                    <h3>Shadow Mode</h3>
+                    <p style="font-size:0.85rem; color:#8b949e; margin-top:10px;">Trace the code. Low error tolerance.</p>
+                </div>
+
+                <div class="mode-card" onclick="startGame('human')">
+                    <div class="mode-icon"><i class="fas fa-keyboard"></i></div>
+                    <h3>Human Mode</h3>
+                    <p style="font-size:0.85rem; color:#8b949e; margin-top:10px;">Solve the Question. Write code from memory.</p>
+                </div>
+            </div>
+            <button onclick="backToMenu()" style="margin-top:40px; background:transparent; border:none; color:#8b949e; cursor:pointer;">Cancel</button>
+        </div>
+
+        <div id="game-arena">
+            <div class="arena-header">
+                <div onclick="backToMenu()" style="cursor:pointer; color:var(--text-muted);">
+                    <i class="fas fa-arrow-left"></i> Quit
+                </div>
+                <h2 id="arena-title">Cricket Arena</h2>
+                <div style="font-weight:bold; color:var(--accent-green);">Score: <span id="current-score">0</span></div>
+            </div>
+
+            <div class="field-display" id="sport-field">
+                <i class="fas fa-baseball-ball sport-object" id="ball"></i>
+                <i class="fas fa-bars sport-target" id="target"></i>
+                <div class="score-msg" id="score-text">SIXER!</div>
+            </div>
+
+            <div class="code-zone">
+                <div class="task-card">
+                    <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+                        <h4 style="color:#8b949e;">Round <span id="round-num">1</span>/3</h4>
+                        <span id="feedback-msg" style="font-weight:bold;"></span>
+                    </div>
+
+                    <div id="human-question">
+                        </div>
+
+                    <div class="editor-container">
+                        <div id="shadow-text" class="editor-font">print("Hello")</div>
+                        
+                        <input type="text" class="input-box editor-font" id="user-input" autocomplete="off" spellcheck="false">
+                    </div>
+                    
+                    <div class="action-area">
+                        <button class="hint-btn" onclick="useHint()"><i class="fas fa-lightbulb"></i> Hint</button>
+                        <button class="submit-btn" onclick="checkCode()">Submit</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <div class="modal-overlay" id="victory-modal">
+        <div class="modal-card">
+            <i class="fas fa-trophy" style="font-size: 4rem; color: #f1c40f; margin-bottom: 20px;"></i>
+            <h2 style="margin-bottom: 10px;">Game Over</h2>
+            <p id="final-msg" style="color: #8b949e; margin-bottom:20px;">Result</p>
+            <div style="font-size: 3rem; color: var(--accent-green); font-weight: 700; margin-bottom: 20px;" id="money-display">
+                + ₹0
+            </div>
+            <button onclick="backToMenu()" style="background: var(--accent-blue); color: white; padding: 12px 24px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold;">
+                Back to Menu
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // --- 1. SETUP NAME & WALLET ---
+        const username = localStorage.getItem('codered_username') || "Guest";
+        document.getElementById('sidebar-name').innerText = username;
+        document.getElementById('sidebar-avatar').innerText = username.charAt(0).toUpperCase();
+
+        let balance = parseInt(localStorage.getItem('codered_balance') || 4500);
+        document.getElementById('sidebar-wallet').innerText = "₹" + balance.toLocaleString();
+
+        // --- DATA WITH QUESTIONS & ANSWERS ---
+        const gamesData = {
+            'Cricket': { 
+                icon: 'fa-baseball-ball', target: 'fa-bars', winMsg: "SIXER!", bg: "#1e3c72", 
+                levels: [
+                    { q: "Print 'Howzat' to the screen", code: 'print("Howzat")' },
+                    { q: "Set variable runs to 6", code: 'runs = 6' },
+                    { q: "Check if out is False", code: 'if out == False:' }
+                ]
+            },
+            'Football': { 
+                icon: 'fa-futbol', target: 'fa-border-all', winMsg: "GOAL!", bg: "#11998e", 
+                levels: [
+                    { q: "Define a function named kick", code: 'def kick():' },
+                    { q: "Set goal to True", code: 'goal = True' },
+                    { q: "Call pass function with ball", code: 'pass(ball)' }
+                ]
+            },
+            'Hockey': { 
+                icon: 'fa-hockey-puck', target: 'fa-border-all', winMsg: "GOAL!", bg: "#cb2d3e", 
+                levels: [
+                    { q: "Call the hit method on stick", code: 'stick.hit()' },
+                    { q: "Set speed to 50", code: 'speed = 50' },
+                    { q: "Loop while time > 0", code: 'while time > 0:' }
+                ]
+            },
+            'Tennis': { 
+                icon: 'fa-table-tennis', target: 'fa-minus', winMsg: "ACE!", bg: "#f38181", 
+                levels: [
+                    { q: "Call serve with speed 100", code: 'serve(speed=100)' },
+                    { q: "Set score to 15", code: 'score = 15' },
+                    { q: "Set match_point to True", code: 'match_point = True' }
+                ]
+            },
+            'Volleyball': { 
+                icon: 'fa-volleyball-ball', target: 'fa-minus', winMsg: "SPIKE!", bg: "#8e2de2", 
+                levels: [
+                    { q: "Call the jump function", code: 'jump()' },
+                    { q: "Call spike with power", code: 'spike(power)' },
+                    { q: "Increment points by 1", code: 'points += 1' }
+                ]
+            }
+        };
+
+        // --- STATE ---
+        let currentSport = '';
+        let currentMode = ''; 
+        let currentRound = 0;
+        let score = 0;
+        let currentTargetCode = '';
+        let totalErrors = 0; // Track Shadow Mode errors
+
+        // --- FUNCTIONS ---
+
+        function showModeSelect(sport) {
+            currentSport = sport;
+            document.getElementById('game-menu').style.display = 'none';
+            document.getElementById('mode-selection').style.display = 'flex';
+        }
+
+        function startGame(mode) {
+            currentMode = mode;
+            currentRound = 0;
+            score = 0;
+            totalErrors = 0;
+            
+            document.getElementById('mode-selection').style.display = 'none';
+            document.getElementById('game-arena').style.display = 'flex';
+            
+            const data = gamesData[currentSport];
+            document.getElementById('arena-title').innerText = currentSport;
+            document.getElementById('ball').className = `fas ${data.icon} sport-object`;
+            document.getElementById('target').className = `fas ${data.target} sport-target`;
+            document.getElementById('score-text').innerText = data.winMsg;
+            document.getElementById('sport-field').style.background = data.bg;
+
+            // UI Toggling based on Mode
+            const input = document.getElementById('user-input');
+            
+            if(mode === 'shadow') {
+                document.getElementById('shadow-text').style.display = 'block';
+                document.getElementById('human-question').style.display = 'none';
+                input.placeholder = ""; // NO PLACEHOLDER for Shadow
+                input.style.color = "var(--accent-green)";
+            } else {
+                document.getElementById('shadow-text').style.display = 'none';
+                document.getElementById('human-question').style.display = 'block';
+                input.placeholder = "Type code here...";
+                input.style.color = "white";
+            }
+
+            loadRound();
+        }
+
+        function backToMenu() {
+            document.getElementById('game-arena').style.display = 'none';
+            document.getElementById('mode-selection').style.display = 'none';
+            document.getElementById('victory-modal').style.display = 'none';
+            document.getElementById('game-menu').style.display = 'grid';
+            balance = parseInt(localStorage.getItem('codered_balance') || 4500);
+            document.getElementById('sidebar-wallet').innerText = "₹" + balance.toLocaleString();
+        }
+
+        function loadRound() {
+            if(currentRound >= 3) {
+                endGame();
+                return;
+            }
+
+            const level = gamesData[currentSport].levels[currentRound];
+            currentTargetCode = level.code;
+            
+            // Set Task Text
+            if(currentMode === 'human') {
+                document.getElementById('human-question').innerText = "Task: " + level.q;
+            } else {
+                document.getElementById('shadow-text').innerText = level.code;
+            }
+
+            // Reset Input
+            const input = document.getElementById('user-input');
+            input.value = "";
+            input.focus();
+            
+            document.getElementById('round-num').innerText = currentRound + 1;
+            document.getElementById('current-score').innerText = score;
+            document.getElementById('feedback-msg').innerText = "";
+
+            // Reset Animation
+            const ball = document.getElementById('ball');
+            ball.style.left = '10%';
+            ball.classList.remove('score-anim', 'fail-anim');
+            document.getElementById('score-text').classList.remove('show-score');
+        }
+
+        function useHint() {
+            // Fills first 3 chars
+            const partial = currentTargetCode.substring(0, 3);
+            document.getElementById('user-input').value = partial;
+            document.getElementById('user-input').focus();
+        }
+
+        function checkCode() {
+            const input = document.getElementById('user-input').value;
+            const ball = document.getElementById('ball');
+            const feedback = document.getElementById('feedback-msg');
+
+            // Compare Input vs Target Code
+            if (input.trim() === currentTargetCode) {
+                // CORRECT
+                score++;
+                feedback.innerText = "+1 Point!";
+                feedback.style.color = "var(--accent-green)";
+                ball.classList.add('score-anim');
+                setTimeout(() => document.getElementById('score-text').classList.add('show-score'), 500);
+            } else {
+                // WRONG
+                score--; 
+                if(score < 0) score = 0;
+                totalErrors++; // Track errors for Shadow Mode logic
+                
+                feedback.innerText = "-1 Point (Missed)";
+                feedback.style.color = "var(--accent-red)";
+                ball.classList.add('fail-anim');
+            }
+
+            document.getElementById('current-score').innerText = score;
+
+            currentRound++;
+            setTimeout(loadRound, 2000);
+        }
+
+        function endGame() {
+            const modal = document.getElementById('victory-modal');
+            const msg = document.getElementById('final-msg');
+            const money = document.getElementById('money-display');
+            let reward = 0;
+
+            // REWARD LOGIC
+            if(currentMode === 'human') {
+                // Human: Needs 3 correct answers
+                if(score >= 3) reward = 10;
+            } else {
+                // Shadow: Needs < 5 total errors (Since it's 3 rounds, basically needs perfect typing)
+                if(totalErrors < 5 && score >= 2) reward = 10;
+            }
+
+            if(reward > 0) {
+                const newBal = balance + reward;
+                localStorage.setItem('codered_balance', newBal);
+                msg.innerText = "Challenge Complete! Excellent Work.";
+                money.innerText = "+ ₹10";
+                money.style.color = "var(--accent-green)";
+            } else {
+                msg.innerText = "Game Over. Practice more to earn rewards.";
+                money.innerText = "+ ₹0";
+                money.style.color = "#8b949e";
+            }
+            
+            modal.style.display = 'flex';
+        }
+
+        document.getElementById('user-input').addEventListener("keypress", function(e) {
+            if (e.key === "Enter") checkCode();
+        });
+
+    </script>
+</body>
+</html>

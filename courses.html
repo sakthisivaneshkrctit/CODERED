@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CODERED - All Courses</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+    <style>
+        /* CORE STYLES */
+        :root { --bg-dark: #0f1014; --bg-card: #18191f; --bg-sidebar: #0a0b0d; --accent-red: #ff3e55; --accent-blue: #2d8cf0; --accent-green: #2ecc71; --text-main: #ffffff; --text-muted: #8b949e; --border-color: #2f333a; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background-color: var(--bg-dark); color: var(--text-main); display: flex; height: 100vh; overflow: hidden; }
+        .sidebar { width: 260px; background-color: var(--bg-sidebar); border-right: 1px solid var(--border-color); display: flex; flex-direction: column; padding: 20px; flex-shrink: 0; }
+        .brand { display: flex; align-items: center; gap: 10px; font-size: 1.2rem; font-weight: 700; margin-bottom: 40px; color: var(--accent-red); }
+        .nav-menu { list-style: none; flex-grow: 1; }
+        .nav-link { display: flex; align-items: center; gap: 12px; padding: 12px 16px; text-decoration: none; color: var(--text-muted); border-radius: 8px; transition: all 0.3s ease; font-weight: 500; margin-bottom: 5px;}
+        .nav-link:hover { background-color: rgba(255, 255, 255, 0.05); color: white; }
+        .nav-link.active { background-color: rgba(255, 62, 85, 0.1); color: var(--accent-red); border-left: 3px solid var(--accent-red); }
+        .wallet-badge { margin-left: auto; color: var(--accent-green); font-size: 0.9rem; }
+        .user-profile { margin-top: auto; display: flex; align-items: center; gap: 12px; padding: 15px; background-color: var(--bg-card); border-radius: 12px; border-top: 1px solid var(--border-color); }
+        .avatar { width: 40px; height: 40px; border-radius: 50%; background-color: var(--accent-red); display: flex; align-items: center; justify-content: center; font-weight: bold; color: white; }
+        .main-content { flex-grow: 1; padding: 30px; overflow-y: auto; }
+        .course-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 25px; padding-bottom: 50px; }
+        .course-card { background-color: var(--bg-card); border-radius: 16px; overflow: hidden; border: 1px solid var(--border-color); transition: transform 0.2s; display: flex; flex-direction: column; }
+        .course-card:hover { transform: translateY(-5px); }
+        .course-header { height: 140px; display: flex; align-items: center; justify-content: center; position: relative; }
+        
+        /* Dynamic Styles */
+        .style-green { background: linear-gradient(135deg, #2ecc71 0%, #f1c40f 100%); }
+        .style-blue { background: linear-gradient(135deg, #2d8cf0 0%, #3498db 100%); }
+        .style-purple { background: linear-gradient(135deg, #8e44ad 0%, #9b59b6 100%); }
+        .style-red { background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); }
+
+        .course-body { padding: 20px; display: flex; flex-direction: column; flex-grow: 1; }
+        .card-footer { margin-top: auto; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-color); padding-top: 15px; }
+        .price { font-weight: 700; color: var(--accent-red); }
+        .btn { padding: 8px 16px; border-radius: 6px; border: none; cursor: pointer; font-weight: 600; text-decoration: none; font-size: 0.9rem; }
+        .btn-primary { background-color: var(--accent-blue); color: white; }
+        .btn-buy { background-color: var(--accent-red); color: white; }
+        .badge-enrolled { position: absolute; top: 15px; right: 15px; background: rgba(46, 204, 113, 0.9); color: #000; font-weight: bold; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; }
+    </style>
+</head>
+<body>
+
+    <nav class="sidebar">
+        <div class="brand"><i class="fas fa-bolt"></i> CODERED</div>
+        <ul class="nav-menu">
+            <li class="nav-item"><a href="index.html" class="nav-link"><i class="fas fa-home"></i> Home</a></li>
+            <li class="nav-item"><a href="courses.html" class="nav-link active"><i class="fas fa-book-open"></i> Courses</a></li>
+            <li class="nav-item"><a href="mycorse.html" class="nav-link"><i class="fas fa-folder"></i> My Courses</a></li>
+            <li class="nav-item"><a href="game.html" class="nav-link"><i class="fas fa-gamepad"></i> Games</a></li>
+            <li class="nav-item">
+                <a href="wallet.html" class="nav-link">
+                    <i class="fas fa-wallet"></i> Wallet
+                    <span class="wallet-badge" id="wallet-display">₹4,500</span>
+                </a>
+            </li>
+        </ul>
+        <div class="user-profile">
+            <div class="avatar" id="sidebar-avatar">U</div>
+            <div>
+                <h4 id="sidebar-name">Loading...</h4>
+                <p style="font-size:0.8rem; color:#8b949e;">Student</p>
+            </div>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <h1 style="margin-bottom: 30px;">All Courses</h1>
+        <div class="course-grid" id="student-course-container"></div>
+    </main>
+
+    <script>
+        // --- 1. SETUP NAME & WALLET ---
+        // Get username from storage
+        const username = localStorage.getItem('codered_username') || "Guest";
+        
+        // Update sidebar
+        document.getElementById('sidebar-name').innerText = username;
+        document.getElementById('sidebar-avatar').innerText = username.charAt(0).toUpperCase();
+
+        let walletBalance = parseInt(localStorage.getItem('codered_balance') || 4500);
+        document.getElementById('wallet-display').innerText = "₹" + walletBalance.toLocaleString();
+
+        // Get DB or Create Defaults
+        let coursesDB = JSON.parse(localStorage.getItem('codered_courses_data'));
+        if (!coursesDB) {
+            coursesDB = {
+                'py': { id: 'py', title: "Python Mastery", desc: "Master Python from basics.", price: 2000, style: 'style-green', icon: 'fa-python' },
+                'c': { id: 'c', title: "C Programming", desc: "Low-level power applications.", price: 2000, style: 'style-blue', icon: 'fa-microchip' }
+            };
+            // Save defaults immediately so MyCourses can see them too
+            localStorage.setItem('codered_courses_data', JSON.stringify(coursesDB));
+        }
+
+        // --- 2. RENDER COURSES ---
+        const container = document.getElementById('student-course-container');
+        container.innerHTML = "";
+
+        Object.keys(coursesDB).forEach(key => {
+            const c = coursesDB[key];
+            
+            // Check Unlock Status
+            const isUnlocked = localStorage.getItem('codered_status_' + c.id) === 'unlocked';
+            
+            let actionHtml = '';
+            let headerBadge = '';
+            
+            if(isUnlocked) {
+                actionHtml = `
+                    <span class="price" style="color:var(--accent-green)">Owned</span>
+                    <a href="mycorse.html" class="btn btn-primary">Continue</a>
+                `;
+                headerBadge = '<span class="badge-enrolled">Enrolled</span>';
+            } else {
+                actionHtml = `
+                    <span class="price">₹${c.price}</span>
+                    <button class="btn btn-buy" onclick="buyCourse('${c.id}')">Unlock</button>
+                `;
+            }
+
+            const html = `
+                <div class="course-card">
+                    <div class="course-header ${c.style}">
+                        ${headerBadge}
+                        <i class="fas ${c.icon || 'fa-book'} fa-4x" style="color: white;"></i>
+                    </div>
+                    <div class="course-body">
+                        <h3>${c.title}</h3>
+                        <p style="color:#8b949e; font-size:0.9rem; margin-bottom:15px;">${c.desc}</p>
+                        <div class="card-footer">
+                            ${actionHtml}
+                        </div>
+                    </div>
+                </div>
+            `;
+            container.innerHTML += html;
+        });
+
+        // --- 3. BUY FUNCTION ---
+        function buyCourse(id) {
+            const c = coursesDB[id];
+            
+            if (walletBalance >= parseInt(c.price)) {
+                if(confirm(`Confirm: Unlock ${c.title} for ₹${c.price}?`)) {
+                    
+                    // 1. Deduct Balance
+                    walletBalance -= parseInt(c.price);
+                    localStorage.setItem('codered_balance', walletBalance);
+                    document.getElementById('wallet-display').innerText = "₹" + walletBalance.toLocaleString();
+
+                    // 2. Save History
+                    let history = JSON.parse(localStorage.getItem('codered_transactions') || "[]");
+                    history.unshift({ title: `Course Unlock: ${c.title}`, date: new Date().toLocaleDateString(), amount: c.price, type: "expense" });
+                    localStorage.setItem('codered_transactions', JSON.stringify(history));
+
+                    // 3. Mark as UNLOCKED (Crucial)
+                    localStorage.setItem('codered_status_' + id, 'unlocked');
+                    
+                    // 4. Update Owner's User List (Mark as paid)
+                    let allUsers = JSON.parse(localStorage.getItem('codered_all_users') || "[]");
+                    let currentUser = localStorage.getItem('codered_username');
+                    allUsers = allUsers.map(user => {
+                        if(user.name === currentUser) return { ...user, paid: true };
+                        return user;
+                    });
+                    localStorage.setItem('codered_all_users', JSON.stringify(allUsers));
+
+                    alert("Course Unlocked Successfully!");
+                    // Reload to update the button to "Continue"
+                    location.reload(); 
+                }
+            } else {
+                alert(`Insufficient Balance! You need ₹${c.price}`);
+            }
+        }
+    </script>
+</body>
+</html>

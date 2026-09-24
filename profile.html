@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CODERED - Profile</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-dark: #0f1014;
+            --bg-card: #18191f;
+            --bg-sidebar: #0a0b0d;
+            --accent-red: #ff3e55;
+            --accent-blue: #2d8cf0;
+            --accent-green: #2ecc71;
+            --text-main: #ffffff;
+            --text-muted: #8b949e;
+            --border-color: #2f333a;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background-color: var(--bg-dark); color: var(--text-main); display: flex; height: 100vh; overflow: hidden; }
+
+        /* Sidebar */
+        .sidebar { width: 260px; background-color: var(--bg-sidebar); border-right: 1px solid var(--border-color); display: flex; flex-direction: column; padding: 20px; flex-shrink: 0; }
+        .brand { display: flex; align-items: center; gap: 10px; font-size: 1.2rem; font-weight: 700; margin-bottom: 40px; color: var(--accent-red); }
+        .nav-menu { list-style: none; flex-grow: 1; }
+        .nav-link { display: flex; align-items: center; gap: 12px; padding: 12px 16px; text-decoration: none; color: var(--text-muted); border-radius: 8px; transition: all 0.3s ease; font-weight: 500; margin-bottom: 5px; }
+        .nav-link:hover { background-color: rgba(255, 255, 255, 0.05); color: white; }
+        .nav-link.active { background-color: rgba(255, 62, 85, 0.1); color: var(--accent-red); border-left: 3px solid var(--accent-red); }
+        .wallet-badge { margin-left: auto; color: var(--accent-green); font-size: 0.9rem; }
+        .user-profile { margin-top: auto; display: flex; align-items: center; gap: 12px; padding: 15px; background-color: var(--bg-card); border-radius: 12px; border-top: 1px solid var(--border-color); }
+        .avatar { width: 40px; height: 40px; border-radius: 50%; background-color: var(--accent-red); display: flex; align-items: center; justify-content: center; font-weight: bold; overflow: hidden; }
+        .avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+        /* Main Content */
+        .main-content { flex-grow: 1; padding: 40px; overflow-y: auto; }
+        .page-header { margin-bottom: 30px; border-bottom: 1px solid var(--border-color); padding-bottom: 20px; }
+        .page-header h1 { font-size: 2rem; font-weight: 700; margin-bottom: 5px; }
+
+        /* Form Grid */
+        .profile-container { display: grid; grid-template-columns: 250px 1fr; gap: 40px; max-width: 1000px; }
+
+        /* Left Column: Photo */
+        .photo-section { display: flex; flex-direction: column; align-items: center; gap: 20px; }
+        .profile-preview {
+            width: 150px; height: 150px; border-radius: 50%; border: 3px solid var(--accent-red);
+            background: #23242a; display: flex; align-items: center; justify-content: center;
+            overflow: hidden; position: relative;
+        }
+        .profile-preview img { width: 100%; height: 100%; object-fit: cover; }
+        .profile-preview i { font-size: 3rem; color: #444; }
+        
+        .upload-btn {
+            background: #23242a; color: white; padding: 8px 16px; border: 1px solid var(--border-color);
+            border-radius: 6px; cursor: pointer; font-size: 0.9rem; transition: 0.3s;
+        }
+        .upload-btn:hover { border-color: var(--accent-blue); color: var(--accent-blue); }
+        input[type="file"] { display: none; }
+
+        /* Right Column: Form */
+        .form-section { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .full-width { grid-column: span 2; }
+        
+        .form-group { display: flex; flex-direction: column; gap: 8px; }
+        label { color: var(--text-muted); font-size: 0.85rem; font-weight: 600; }
+        
+        .form-input {
+            background: var(--bg-card); border: 1px solid var(--border-color); color: white;
+            padding: 12px; border-radius: 8px; font-size: 1rem; outline: none; transition: 0.3s;
+        }
+        .form-input:focus { border-color: var(--accent-blue); }
+        .form-input:disabled { opacity: 0.6; cursor: not-allowed; border-color: transparent; background: #1a1a1e; }
+
+        .section-header { grid-column: span 2; margin-top: 20px; margin-bottom: 10px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; font-size: 1.1rem; color: var(--accent-green); }
+
+        /* Save Button */
+        .save-btn {
+            grid-column: span 2; background: var(--accent-red); color: white; border: none;
+            padding: 15px; border-radius: 8px; font-size: 1rem; font-weight: bold; cursor: pointer;
+            margin-top: 20px; transition: transform 0.2s;
+        }
+        .save-btn:hover { transform: translateY(-2px); background: #e0364b; }
+
+    </style>
+</head>
+<body>
+
+    <nav class="sidebar">
+        <div class="brand"><i class="fas fa-bolt"></i> CODERED</div>
+        <ul class="nav-menu">
+            <li class="nav-item"><a href="index.html" class="nav-link"><i class="fas fa-home"></i> Home</a></li>
+            <li class="nav-item"><a href="courses.html" class="nav-link"><i class="fas fa-book-open"></i> Courses</a></li>
+            <li class="nav-item"><a href="mycorse.html" class="nav-link"><i class="fas fa-folder"></i> My Courses</a></li>
+            <li class="nav-item"><a href="game.html" class="nav-link"><i class="fas fa-gamepad"></i> Games</a></li>
+            <li class="nav-item"><a href="wallet.html" class="nav-link"><i class="fas fa-wallet"></i> Wallet</a></li>
+            <li class="nav-item"><a href="certificate.html" class="nav-link"><i class="fas fa-certificate"></i> Certificates</a></li>
+            <li class="nav-item"><a href="profile.html" class="nav-link active"><i class="fas fa-user"></i> Profile</a></li>
+        </ul>
+    </nav>
+
+    <main class="main-content">
+        <div class="page-header">
+            <h1>My Profile</h1>
+            <p>Manage your identity details.</p>
+        </div>
+
+        <div class="profile-container">
+            <div class="photo-section">
+                <div class="profile-preview" id="photo-preview">
+                    <i class="fas fa-user"></i>
+                </div>
+                <label class="upload-btn">
+                    <i class="fas fa-camera"></i> Change Photo
+                    <input type="file" id="photo-upload" accept="image/*" onchange="previewImage(this, 'photo-preview')">
+                </label>
+                <p style="font-size:0.75rem; color:#666; text-align:center;">This photo will appear on your certificates.</p>
+            </div>
+
+            <div class="form-section">
+                
+                <h3 class="section-header">Personal Information</h3>
+
+                <div class="form-group full-width">
+                    <label>Full Name (Official)</label>
+                    <input type="text" class="form-input" id="inp-name" value="Alex Developer" disabled title="Contact support to change name">
+                </div>
+
+                <div class="form-group">
+                    <label>Father's Name</label>
+                    <input type="text" class="form-input" id="inp-father" placeholder="Enter Father's Name">
+                </div>
+
+                <div class="form-group">
+                    <label>Mother's Name</label>
+                    <input type="text" class="form-input" id="inp-mother" placeholder="Enter Mother's Name">
+                </div>
+
+                <h3 class="section-header">Location & Education</h3>
+
+                <div class="form-group">
+                    <label>State</label>
+                    <input type="text" class="form-input" id="inp-state" placeholder="e.g. Tamil Nadu">
+                </div>
+
+                <div class="form-group">
+                    <label>Country</label>
+                    <input type="text" class="form-input" id="inp-country" value="India">
+                </div>
+
+                <div class="form-group full-width">
+                    <label>School / College Name</label>
+                    <input type="text" class="form-input" id="inp-school" placeholder="Enter Institution Name">
+                </div>
+
+                <button class="save-btn" onclick="saveProfile()">
+                    <i class="fas fa-save"></i> Save Changes
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // --- 1. Load Data on Startup ---
+        window.onload = function() {
+            // Load Text Fields
+            const fields = ['father', 'mother', 'state', 'country', 'school'];
+            fields.forEach(id => {
+                const val = localStorage.getItem('codered_' + id);
+                if(val) document.getElementById('inp-' + id).value = val;
+            });
+
+            // Load Name (Default if empty)
+            document.getElementById('inp-name').value = localStorage.getItem('codered_username') || "Alex Developer";
+
+            // Load Image
+            const photoData = localStorage.getItem('codered_photo');
+            if(photoData) {
+                document.getElementById('photo-preview').innerHTML = `<img src="${photoData}">`;
+            }
+        };
+
+        // --- 2. Image Preview & Convert to Base64 ---
+        function previewImage(input, previewId) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById(previewId).innerHTML = `<img src="${e.target.result}">`;
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        // --- 3. Save Function ---
+        function saveProfile() {
+            localStorage.setItem('codered_father', document.getElementById('inp-father').value);
+            localStorage.setItem('codered_mother', document.getElementById('inp-mother').value);
+            localStorage.setItem('codered_state', document.getElementById('inp-state').value);
+            localStorage.setItem('codered_country', document.getElementById('inp-country').value);
+            localStorage.setItem('codered_school', document.getElementById('inp-school').value);
+
+            const photoImg = document.querySelector('#photo-preview img');
+            if(photoImg) localStorage.setItem('codered_photo', photoImg.src);
+
+            alert("Profile Updated Successfully!");
+        }
+    </script>
+</body>
+</html>
